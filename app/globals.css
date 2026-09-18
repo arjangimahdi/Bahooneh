@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+/* Bahane palette (spec §11): warm neutrals with a pomegranate accent that clears WCAG AA on the CTA. */
+:root {
+  color-scheme: light;
+  --paper: #faf3ef;
+  --surface: #fffcfa;
+  --ink: #33403f;
+  --muted: #5e6967;
+  --line: #e6dcd5;
+  --accent: #a83e5c;
+  --accent-ink: #ffffff;
+  --accent-soft: #f7e3e9;
+  --secondary: #45614a;
+  --secondary-soft: #e4ede6;
+  --warn: #934c22;
+  --warn-soft: #f7e6dc;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --paper: #17120f;
+    --surface: #1f1815;
+    --ink: #f1e8e2;
+    --muted: #b8a99f;
+    --line: #352b26;
+    --accent: #e28ca0;
+    --accent-ink: #2a0f17;
+    --accent-soft: #3a1f28;
+    --secondary: #9fc2a0;
+    --secondary-soft: #1f2d21;
+    --warn: #e2a467;
+    --warn-soft: #33241a;
+  }
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-accent-soft: var(--accent-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-soft: var(--secondary-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --font-sans: var(--font-vazirmatn), system-ui, sans-serif;
+  --radius-card: 14px;
+}
+
+html {
+  font-family: var(--font-sans);
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  min-height: 100dvh;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* Persian digits everywhere numbers render through the browser (inputs, dates). */
+input[type="number"] {
+  font-variant-numeric: tabular-nums;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+@keyframes spin-slow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .anim-rise {
+    animation: rise 0.35s ease both;
+  }
+  .anim-pulse {
+    animation: pulse-soft 1.6s ease-in-out infinite;
+  }
+  .anim-spin {
+    animation: spin-slow 6s linear infinite;
+  }
+}
