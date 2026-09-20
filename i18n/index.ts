@@ -1,5 +1,7 @@
 import fa, { type Dictionary } from "./fa";
 
+export type { Dictionary };
+
 /** Recursively builds the dotted key paths of a nested dictionary ("wizard.target.title"). */
 type Paths<T, Prefix extends string = ""> = {
   [K in keyof T & string]: T[K] extends string

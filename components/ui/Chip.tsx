@@ -18,16 +18,9 @@ const chip = tv({
             md: "h-10 px-4 text-sm",
         },
         selected: {
-            true: "",
+            true: "border-accent bg-accent text-accent-ink hover:border-accent hover:bg-accent hover:opacity-90",
         },
     },
-    compoundVariants: [
-        {
-            variant: ["secondary", "primary"],
-            selected: true,
-            class: "border-accent bg-accent text-accent-ink hover:opacity-90",
-        },
-    ],
     defaultVariants: {
         variant: "secondary",
         size: "md",
@@ -40,11 +33,12 @@ export type ChipProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "className
         className?: string;
     };
 
-export function Chip({ variant, size, selected, className, type = "button", ...props }: ChipProps) {
+export function Chip({ variant, size, selected, className, type = "button", role, ...props }: ChipProps) {
     return (
         <button
             type={type}
-            aria-pressed={selected ?? false}
+            role={role}
+            aria-pressed={role ? undefined : (selected ?? false)}
             className={chip({ variant, size, selected, className })}
             {...props}
         />

@@ -1,6 +1,6 @@
 /**
  * Persian (fa-IR) copy. Every user-facing string lives here and is referenced by key.
- * Chip labels are keyed by their stable option id from `lib/wizard/options.ts`.
+ * Chip labels are keyed by their stable option id from `utils/wizard/options.ts`.
  */
 const fa = {
   app: {
