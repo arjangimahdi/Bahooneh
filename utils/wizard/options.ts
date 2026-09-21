@@ -63,6 +63,7 @@ export const OWNS_BY_INTEREST: Record<(typeof INTERESTS)[number], readonly (type
 
 export const BUDGET_FLOOR = 50_000;
 export const BUDGET_CEILING = 30_000_000;
+export const FREE_TEXT_MIN = 5;
 export const FREE_TEXT_MAX = 500;
 
 export const BUDGET_PRESETS = [

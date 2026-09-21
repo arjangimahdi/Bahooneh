@@ -30,6 +30,8 @@ const fa = {
     toman: "تومان",
     stepOf: "مرحله {current} از {total}",
     customLabel: "توضیح خودت",
+    required: "یکی از گزینه‌ها رو انتخاب کن.",
+    tooShort: "حداقل {min} کاراکتر بنویس.",
   },
   wizard: {
     target: {

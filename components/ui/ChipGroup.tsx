@@ -8,6 +8,7 @@ interface Props<T extends string> {
     chips: readonly T[];
     value: readonly T[];
     multiSelect?: boolean;
+    error?: string;
     onChange: (ids: T[]) => void;
 }
 
@@ -18,6 +19,7 @@ export function ChipGroup<T extends string>({
     chips,
     value,
     multiSelect = false,
+    error,
     onChange,
 }: Props<T>) {
     const toggle = (id: T) => {
@@ -30,7 +32,7 @@ export function ChipGroup<T extends string>({
 
     return (
         <fieldset className="flex flex-col gap-3">
-            <legend className="text-sm font-medium text-muted">
+            <legend className={`text-sm font-medium ${error ? "text-warn" : "text-muted"}`}>
                 {label}
                 {hint && <span className="ms-1 text-xs font-normal text-muted/80">{hint}</span>}
             </legend>
@@ -41,6 +43,7 @@ export function ChipGroup<T extends string>({
                     </Chip>
                 ))}
             </div>
+            {error && <p className="text-sm text-warn">{error}</p>}
         </fieldset>
     );
 }

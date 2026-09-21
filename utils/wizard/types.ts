@@ -1,3 +1,4 @@
+import type { TKey } from "@/i18n";
 import type {
     AGE_RANGES,
     ALLERGIES,
@@ -64,9 +65,12 @@ export interface WizardDraft {
     budget: BudgetDraft;
 }
 
+export type StepErrors = Partial<Record<string, TKey>>;
+
 export interface WizardState {
     currentStepIndex: number;
     draft: WizardDraft;
+    errors: Partial<Record<WizardStepId, StepErrors>>;
 }
 
 export interface WizardActions {
@@ -75,6 +79,7 @@ export interface WizardActions {
     prev: () => void;
     reset: () => void;
     setStepDraft: <S extends WizardStepId>(stepId: S, stepDraft: Partial<WizardDraft[S]>) => void;
+    validateStep: (stepId: WizardStepId) => boolean;
 }
 
 export type WizardStore = WizardState & WizardActions;
