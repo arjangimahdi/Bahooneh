@@ -22,11 +22,29 @@ export const button = tv({
         fullWidth: {
             true: "w-full",
         },
+        loading: {
+            true: "relative text-transparent",
+        },
     },
     defaultVariants: {
         variant: "primary",
         size: "md",
         fullWidth: false,
+        loading: false,
+    },
+});
+
+const spinner = tv({
+    base: "absolute inset-0 m-auto size-5 animate-spin rounded-full border-2 border-current border-t-transparent",
+    variants: {
+        variant: {
+            primary: "text-accent-ink",
+            secondary: "text-ink",
+            ghost: "text-muted",
+        },
+    },
+    defaultVariants: {
+        variant: "primary",
     },
 });
 
@@ -35,6 +53,27 @@ export type ButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, "classNa
         className?: string;
     };
 
-export function Button({ variant, size, fullWidth, className, type = "button", ...props }: ButtonProps) {
-    return <button type={type} className={button({ variant, size, fullWidth, className })} {...props} />;
+export function Button({
+    variant,
+    size,
+    fullWidth,
+    loading,
+    className,
+    type = "button",
+    disabled,
+    children,
+    ...props
+}: ButtonProps) {
+    return (
+        <button
+            type={type}
+            disabled={disabled || Boolean(loading)}
+            aria-busy={loading || undefined}
+            className={button({ variant, size, fullWidth, loading, className })}
+            {...props}
+        >
+            {children}
+            {loading && <span aria-hidden className={spinner({ variant })} />}
+        </button>
+    );
 }

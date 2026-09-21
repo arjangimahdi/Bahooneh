@@ -43,7 +43,7 @@ Current state: only the home page exists (`app/page.tsx`, `app/layout.tsx`, `com
 ### i18n — every user-facing string goes through `t()`
 
 - `i18n/fa.ts` is the single dictionary (`as const`). `i18n/index.ts` derives a `TKey` union of dotted paths from it, so `t("wizard.target.title")` is type-checked; a typo is a compile error. `t()` interpolates `{var}` placeholders and returns the key itself on a miss so gaps are visible.
-- `chipLabel(group, id)` is the untyped lookup for data-driven option ids (`chips.*` in the dictionary). Chip ids are meant to be stable identifiers shared with a future `lib/wizard/options.ts`; the dictionary keys under `chips` must match those ids exactly.
+- `chipLabel(group, id)` is the untyped lookup for data-driven option ids (`chips.*` in the dictionary). Chip ids are meant to be stable identifiers shared with `utils/wizard/options.ts`; the dictionary keys under `chips` must match those ids exactly.
 - `locale`/`dir` are exported constants (`fa-IR`, `rtl`) and set on `<html>` in the root layout. Use `toPersianDigits()` for any number shown to users and `formatToman()` for currency.
 - Never hardcode Persian (or English) UI text in components — add a key to `fa.ts`.
 

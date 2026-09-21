@@ -4,20 +4,29 @@ import { Button } from "@/components/ui";
 interface Props {
     currentStepIndex: number;
     wizardLength: number;
+    isSubmitting?: boolean;
     next: () => void;
     back: () => void;
-    submit?: () => void;
+    submit: () => void;
 }
 
-export default function WizardNavigation({ currentStepIndex, wizardLength, next, back }: Props) {
+export default function WizardNavigation({
+    currentStepIndex,
+    wizardLength,
+    isSubmitting = false,
+    next,
+    back,
+    submit,
+}: Props) {
+    const isFirstStep = currentStepIndex === 0;
     const isLastStep = currentStepIndex === wizardLength - 1;
 
     return (
-        <div className="flex flex-row justify-between items-center">
-            <Button onClick={() => back()} variant="secondary">
+        <div className="flex items-center justify-between gap-3">
+            <Button onClick={back} variant="secondary" disabled={isFirstStep || isSubmitting}>
                 {t("common.back")}
             </Button>
-            <Button onClick={() => next()} variant="primary">
+            <Button onClick={isLastStep ? submit : next} variant="primary" loading={isSubmitting}>
                 {t(isLastStep ? "common.submit" : "common.next")}
             </Button>
         </div>
