@@ -35,7 +35,7 @@ export interface TargetDraft {
 
 export interface OccasionDraft {
     occasion: Occasion | null;
-    vibe: Vibe | null;
+    vibe: Vibe[];
     freeText: string;
 }
 
