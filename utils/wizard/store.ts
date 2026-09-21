@@ -13,7 +13,7 @@ export const emptyDraft: WizardDraft = {
     },
     occasion: {
         occasion: null,
-        vibe: null,
+        vibe: [],
         freeText: "",
     },
     interests: {

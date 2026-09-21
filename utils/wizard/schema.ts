@@ -1,6 +1,6 @@
 import z from "zod";
-import { AGE_RANGES, FREE_TEXT_MAX, FREE_TEXT_MIN, GENDERS, RELATIONSHIPS } from "./options";
-import type { TargetDraft, WizardStepId } from "./types";
+import { AGE_RANGES, FREE_TEXT_MAX, FREE_TEXT_MIN, GENDERS, OCCASIONS, RELATIONSHIPS, VIBES } from "./options";
+import type { OccasionDraft, TargetDraft, WizardStepId } from "./types";
 
 const required = { message: "common.required" };
 
@@ -17,6 +17,13 @@ export const targetSchema = z.object({
     freeText: optionalFreeText,
 }) satisfies z.ZodType<TargetDraft>;
 
+export const occasionSchema = z.object({
+    occasion: z.enum(OCCASIONS, required),
+    vibe: z.array(z.enum(VIBES)),
+    freeText: optionalFreeText,
+}) satisfies z.ZodType<OccasionDraft>;
+
 export const stepSchemas: Partial<Record<WizardStepId, z.ZodType>> = {
     target: targetSchema,
+    occasion: occasionSchema,
 };

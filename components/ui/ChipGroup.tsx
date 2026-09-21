@@ -33,7 +33,7 @@ export function ChipGroup<T extends string>({
     return (
         <fieldset className="flex flex-col gap-3">
             <legend className={`text-sm font-medium ${error ? "text-warn" : "text-muted"}`}>
-                {label}
+                <span className="inline-block">{label}</span>
                 {hint && <span className="ms-1 text-xs font-normal text-muted/80">{hint}</span>}
             </legend>
             <div className="flex flex-wrap gap-2">
