@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { OWNS_BY_INTEREST, WIZARD_STEPS } from "./options";
 import type { Interest, Owns, StepErrors, WizardDraft, WizardStepId, WizardStore } from "./types";
-import { stepSchemas } from "./schema";
+import { stepSchemas, wizardSchema } from "./schema";
 import type { TKey } from "@/i18n";
 
 export const emptyDraft: WizardDraft = {
@@ -67,6 +67,17 @@ export const useWizardStore = create<WizardStore>()((set, get) => ({
         const { currentStepIndex, validateStep } = get();
         if (!validateStep(WIZARD_STEPS[currentStepIndex])) return;
         set({ currentStepIndex: clampStep(currentStepIndex + 1) });
+    },
+
+    validateAll: () => {
+        const { draft, validateStep } = get();
+        const firstInvalidIndex = WIZARD_STEPS.findIndex((stepId) => !validateStep(stepId));
+        if (firstInvalidIndex !== -1) {
+            set({ currentStepIndex: firstInvalidIndex });
+            return null;
+        }
+        const result = wizardSchema.safeParse(draft);
+        return result.success ? result.data : null;
     },
 
     prev: () => set((state) => ({ currentStepIndex: clampStep(state.currentStepIndex - 1) })),

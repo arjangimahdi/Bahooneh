@@ -1,4 +1,5 @@
 import type { TKey } from "@/i18n";
+import type { WizardPayload } from "./schema";
 import type {
     AGE_RANGES,
     ALLERGIES,
@@ -80,6 +81,7 @@ export interface WizardActions {
     reset: () => void;
     setStepDraft: <S extends WizardStepId>(stepId: S, stepDraft: Partial<WizardDraft[S]>) => void;
     validateStep: (stepId: WizardStepId) => boolean;
+    validateAll: () => WizardPayload | null;
 }
 
 export type WizardStore = WizardState & WizardActions;
