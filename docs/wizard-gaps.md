@@ -8,7 +8,7 @@ Legend: **[Spec]** = spec requirement, **[Ref]** = Bahane does it, **[Bug]** = i
 
 ## Phase 1 — Decisions that change the schema (do these first)
 
-### - [ ] 1. Persist the draft across refreshes **[Spec] [Ref]**
+### - [x] 1. Persist the draft across refreshes **[Spec] [Ref]**
 - **Missing:** `utils/wizard/store.ts` uses plain `create()`. Spec 03 "State persistence" requires the draft to survive an accidental refresh. Today a refresh on `/wizard` loses everything, and a refresh on `/result` makes `payload` null and redirects to `/wizard`.
 - **Where:** `utils/wizard/store.ts`, `app/result/page.tsx`, `components/wizard/WizardShell.tsx`.
 - **Guide:**

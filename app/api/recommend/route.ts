@@ -1,5 +1,5 @@
 import { recommend } from "@/utils/pipe/recommend";
-import { RecommendEvent } from "@/utils/pipe/types";
+import { RecommendEvent } from "@/utils/pipe/events";
 import { wizardSchema } from "@/utils/wizard/schema";
 import { NextRequest, NextResponse } from "next/server";
 

@@ -1,4 +1,5 @@
-import { RecommendEvent, ResultItem, StageEvent } from "@/utils/pipe/types";
+import { RecommendEvent, StageEvent } from "@/utils/pipe/events";
+import { ResultItem } from "@/utils/pipe/types";
 import { WizardPayload } from "@/utils/wizard/schema";
 import { useEffect, useState } from "react";
 
