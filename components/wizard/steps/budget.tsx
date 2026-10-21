@@ -17,7 +17,9 @@ const parseAmount = (raw: string) => {
 export default function BudgetStep() {
     const [budget, patch] = useStepDraft("budget");
     const errors = useStepErrors("budget");
-    const rangeError = errors.range && t(errors.range, { floor: formatToman(BUDGET_FLOOR) });
+    const rangeError =
+        errors.range && t(errors.range, { floor: formatToman(BUDGET_FLOOR), ceiling: formatToman(BUDGET_CEILING) });
+    const isRangeEmpty = budget.min === null || budget.max === null;
 
     return (
         <section className="flex flex-col gap-8">
@@ -41,6 +43,7 @@ export default function BudgetStep() {
                 <RangeSlider
                     label={t("wizard.budget.custom")}
                     value={[budget.min ?? BUDGET_FLOOR, budget.max ?? BUDGET_CEILING]}
+                    empty={isRangeEmpty}
                     onChange={([min, max]) => patch({ min, max, preset: null })}
                     min={BUDGET_FLOOR}
                     max={BUDGET_CEILING}
@@ -66,7 +69,11 @@ export default function BudgetStep() {
                         invalid={Boolean(rangeError)}
                     />
                 </div>
-                {rangeError && <p className="text-sm text-warn">{rangeError}</p>}
+                {rangeError && (
+                    <p role="alert" className="text-sm text-warn">
+                        {rangeError}
+                    </p>
+                )}
             </div>
         </section>
     );

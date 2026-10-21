@@ -1,20 +1,20 @@
 import { t } from "@/i18n";
 import { ChipGroup, Textarea } from "@/components/ui";
-import { ALLERGIES, DISLIKES, FREE_TEXT_MAX, FREE_TEXT_MIN, OWNS_BY_INTEREST } from "@/utils/wizard/options";
+import { ALLERGIES, DISLIKES, FREE_TEXT_MAX, ownsForInterests } from "@/utils/wizard/options";
 import { useStepDraft, useStepErrors, useWizardStore } from "@/utils/wizard/store";
 
 export default function AntiPrefsStep() {
     const [antiPrefs, patch] = useStepDraft("antiPrefs");
     const errors = useStepErrors("antiPrefs");
     const interests = useWizardStore((state) => state.draft.interests.interests);
-    const owns = interests.flatMap((interest) => OWNS_BY_INTEREST[interest]);
+    const owns = ownsForInterests(interests);
 
     return (
         <section className="flex flex-col gap-8">
             <header className="flex flex-col gap-2">
                 <h2 className="text-2xl font-bold">{t("wizard.antiPrefs.title")}</h2>
                 <p className="text-muted">{t("wizard.antiPrefs.goal")}</p>
-                <p className="rounded-card bg-accent-soft px-4 py-3 text-sm text-accent">{t("wizard.antiPrefs.nudge")}</p>
+                <p className="rounded-card bg-accent-soft px-4 py-3 text-sm text-ink">{t("wizard.antiPrefs.nudge")}</p>
             </header>
 
             <ChipGroup
@@ -52,7 +52,7 @@ export default function AntiPrefsStep() {
                 label={t("wizard.antiPrefs.freeText")}
                 placeholder={t("wizard.antiPrefs.placeholder")}
                 hint={t("common.optional")}
-                error={errors.freeText && t(errors.freeText, { min: FREE_TEXT_MIN })}
+                error={errors.freeText && t(errors.freeText)}
                 maxLength={FREE_TEXT_MAX}
                 onChange={(e) => patch({ freeText: e.target.value })}
             />

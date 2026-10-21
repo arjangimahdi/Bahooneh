@@ -7,7 +7,6 @@ import {
     BUDGET_PRESETS,
     DISLIKES,
     FREE_TEXT_MAX,
-    FREE_TEXT_MIN,
     GENDERS,
     INTERESTS,
     OCCASIONS,
@@ -17,28 +16,34 @@ import {
 } from "./options";
 import type { AntiPrefsDraft, BudgetDraft, InterestsDraft, OccasionDraft, TargetDraft, WizardStepId } from "./types";
 
-const required = { message: "common.required" };
+const optionalFreeText = z.string().trim().max(FREE_TEXT_MAX);
 
-const optionalFreeText = z
-    .string()
-    .trim()
-    .max(FREE_TEXT_MAX)
-    .refine((value) => value === "" || value.length >= FREE_TEXT_MIN, {
-        message: "common.tooShort",
-    });
+export const targetSchema = z
+    .object({
+        ageRange: z.enum(AGE_RANGES).nullable(),
+        gender: z.enum(GENDERS).nullable(),
+        relationships: z.array(z.enum(RELATIONSHIPS)),
+        freeText: optionalFreeText,
+    })
+    .refine(
+        (value) =>
+            value.ageRange !== null || value.gender !== null || value.relationships.length > 0 || value.freeText !== "",
+        {
+            message: "wizard.target.error",
+            path: ["step"],
+        }
+    ) satisfies z.ZodType<TargetDraft>;
 
-export const targetSchema = z.object({
-    ageRange: z.enum(AGE_RANGES, required),
-    gender: z.enum(GENDERS, required),
-    relationship: z.enum(RELATIONSHIPS, required),
-    freeText: optionalFreeText,
-}) satisfies z.ZodType<TargetDraft>;
-
-export const occasionSchema = z.object({
-    occasion: z.enum(OCCASIONS, required),
-    vibe: z.array(z.enum(VIBES)),
-    freeText: optionalFreeText,
-}) satisfies z.ZodType<OccasionDraft>;
+export const occasionSchema = z
+    .object({
+        occasion: z.enum(OCCASIONS).nullable(),
+        vibe: z.array(z.enum(VIBES)),
+        freeText: optionalFreeText,
+    })
+    .refine((value) => value.occasion !== null || value.freeText !== "", {
+        message: "wizard.occasion.error",
+        path: ["step"],
+    }) satisfies z.ZodType<OccasionDraft>;
 
 export const interestsSchema = z
     .object({
@@ -82,7 +87,15 @@ export const budgetSchema = z
             });
             return;
         }
-        if (value.max < value.min || value.max > BUDGET_CEILING) {
+        if (value.max > BUDGET_CEILING) {
+            ctx.addIssue({
+                code: "custom",
+                message: "wizard.budget.errorCeiling",
+                path: ["range"],
+            });
+            return;
+        }
+        if (value.max < value.min) {
             ctx.addIssue({
                 code: "custom",
                 message: "wizard.budget.errorOrder",

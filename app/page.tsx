@@ -13,7 +13,7 @@ export default function HomePage() {
                 <p className="max-w-xl text-lg leading-relaxed text-muted">{t("app.description")}</p>
                 <Link
                     href="/wizard"
-                    className="rounded-full bg-accent px-7 py-3 text-lg font-semibold text-accent-ink shadow-sm transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+                    className="rounded-full bg-accent px-7 py-3 text-lg font-semibold text-accent-ink shadow-sm transition hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
                 >
                     {t("app.cta")}
                 </Link>
@@ -24,7 +24,7 @@ export default function HomePage() {
                 <ol className="grid gap-4 sm:grid-cols-3">
                     {HOW_IT_WORKS.map((key, i) => (
                         <li key={key} className="rounded-card border border-line bg-surface p-5">
-                            <span className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent-soft text-sm font-bold text-accent">
+                            <span className="mb-2 inline-flex h-8 w-8 items-center justify-center rounded-full bg-accent-soft text-sm font-bold text-ink">
                                 {toPersianDigits(i + 1)}
                             </span>
                             <p className="leading-relaxed text-ink">{t(key)}</p>

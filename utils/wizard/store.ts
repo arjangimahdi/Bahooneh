@@ -1,14 +1,25 @@
 import { create } from "zustand";
-import { OWNS_BY_INTEREST, WIZARD_STEPS } from "./options";
-import type { Interest, Owns, StepErrors, WizardDraft, WizardStepId, WizardStore } from "./types";
+import { ownsForInterests, WIZARD_STEPS } from "./options";
+import type {
+    Interest,
+    Owns,
+    Relationship,
+    StepErrors,
+    TargetDraft,
+    WizardDraft,
+    WizardState,
+    WizardStepId,
+    WizardStore,
+} from "./types";
 import { stepSchemas, wizardSchema } from "./schema";
 import type { TKey } from "@/i18n";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 export const emptyDraft: WizardDraft = {
     target: {
         ageRange: null,
         gender: null,
-        relationship: null,
+        relationships: [],
         freeText: "",
     },
     occasion: {
@@ -38,7 +49,7 @@ const LAST_STEP_INDEX = WIZARD_STEPS.length - 1;
 const clampStep = (index: number) => Math.min(Math.max(index, 0), LAST_STEP_INDEX);
 
 const pruneAlreadyOwns = (alreadyOwns: Owns[], interests: Interest[]) => {
-    const allowed = new Set(interests.flatMap((interest) => OWNS_BY_INTEREST[interest]));
+    const allowed = new Set(ownsForInterests(interests));
     return alreadyOwns.filter((id) => allowed.has(id));
 };
 
@@ -50,57 +61,83 @@ const getStepErrors = (draft: WizardDraft, stepId: WizardStepId): StepErrors => 
     return Object.fromEntries(result.error.issues.map((issue) => [issue.path.join("."), issue.message as TKey]));
 };
 
-export const useWizardStore = create<WizardStore>()((set, get) => ({
-    currentStepIndex: 0,
-    draft: emptyDraft,
-    errors: {},
+export const useWizardStore = create<WizardStore>()(
+    persist(
+        (set, get) => ({
+            currentStepIndex: 0,
+            draft: emptyDraft,
+            errors: {},
 
-    setStep: (stepIndex) => set({ currentStepIndex: clampStep(stepIndex) }),
+            setStep: (stepIndex) => set({ currentStepIndex: clampStep(stepIndex) }),
 
-    validateStep: (stepId) => {
-        const stepErrors = getStepErrors(get().draft, stepId);
-        set((state) => ({ errors: { ...state.errors, [stepId]: stepErrors } }));
-        return Object.keys(stepErrors).length === 0;
-    },
+            validateStep: (stepId) => {
+                const stepErrors = getStepErrors(get().draft, stepId);
+                set((state) => ({ errors: { ...state.errors, [stepId]: stepErrors } }));
+                return Object.keys(stepErrors).length === 0;
+            },
 
-    next: () => {
-        const { currentStepIndex, validateStep } = get();
-        if (!validateStep(WIZARD_STEPS[currentStepIndex])) return;
-        set({ currentStepIndex: clampStep(currentStepIndex + 1) });
-    },
+            next: () => {
+                const { currentStepIndex, validateStep } = get();
+                if (!validateStep(WIZARD_STEPS[currentStepIndex])) return;
+                set({ currentStepIndex: clampStep(currentStepIndex + 1) });
+            },
 
-    validateAll: () => {
-        const { draft, validateStep } = get();
-        const firstInvalidIndex = WIZARD_STEPS.findIndex((stepId) => !validateStep(stepId));
-        if (firstInvalidIndex !== -1) {
-            set({ currentStepIndex: firstInvalidIndex });
-            return null;
-        }
-        const result = wizardSchema.safeParse(draft);
-        return result.success ? result.data : null;
-    },
+            validateAll: () => {
+                const { draft, validateStep } = get();
+                const firstInvalidIndex = WIZARD_STEPS.findIndex((stepId) => !validateStep(stepId));
+                if (firstInvalidIndex !== -1) {
+                    set({ currentStepIndex: firstInvalidIndex });
+                    return null;
+                }
+                const result = wizardSchema.safeParse(draft);
+                return result.success ? result.data : null;
+            },
 
-    prev: () => set((state) => ({ currentStepIndex: clampStep(state.currentStepIndex - 1) })),
+            prev: () => set((state) => ({ currentStepIndex: clampStep(state.currentStepIndex - 1) })),
 
-    reset: () => set({ currentStepIndex: 0, draft: emptyDraft, errors: {} }),
+            reset: () => set({ currentStepIndex: 0, draft: emptyDraft, errors: {} }),
 
-    setStepDraft: (stepId, stepDraft) =>
-        set((state) => {
-            const draft: WizardDraft = {
-                ...state.draft,
-                [stepId]: { ...state.draft[stepId], ...stepDraft },
-            };
+            setStepDraft: (stepId, stepDraft) =>
+                set((state) => {
+                    const draft: WizardDraft = {
+                        ...state.draft,
+                        [stepId]: { ...state.draft[stepId], ...stepDraft },
+                    };
 
-            if (stepId === "interests") {
-                draft.antiPrefs = {
-                    ...draft.antiPrefs,
-                    alreadyOwns: pruneAlreadyOwns(draft.antiPrefs.alreadyOwns, draft.interests.interests),
-                };
-            }
+                    if (stepId === "interests") {
+                        draft.antiPrefs = {
+                            ...draft.antiPrefs,
+                            alreadyOwns: pruneAlreadyOwns(draft.antiPrefs.alreadyOwns, draft.interests.interests),
+                        };
+                    }
 
-            return { draft, errors: { ...state.errors, [stepId]: {} } };
+                    return { draft, errors: { ...state.errors, [stepId]: {} } };
+                })
         }),
-}));
+        {
+            name: "byadet-wizard",
+            version: 2,
+            storage: createJSONStorage(() => sessionStorage),
+            migrate: (persisted, version) => {
+                const state = persisted as Pick<WizardState, "draft" | "currentStepIndex">;
+                if (version < 2) {
+                    const { relationship, ...target } = state.draft.target as TargetDraft & {
+                        relationship?: Relationship | null;
+                    };
+                    state.draft = {
+                        ...state.draft,
+                        target: { ...target, relationships: relationship ? [relationship] : [] },
+                    };
+                }
+                return state;
+            },
+            partialize: (state) => ({
+                draft: state.draft,
+                currentStepIndex: state.currentStepIndex,
+            }),
+        }
+    )
+)
 
 export const useCurrentStepId = () => useWizardStore((state) => WIZARD_STEPS[state.currentStepIndex]);
 

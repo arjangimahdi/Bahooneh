@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# BYadet · به یادت
 
-## Getting Started
+A Persian (fa-IR, RTL) AI gift finder. Answer five short questions about the person you're buying for (who they are, the occasion, their interests, what to avoid, and your budget). BYadet turns your answers into a short list of real products you can buy from Iranian online shops, with a one-line reason for each pick.
 
-First, run the development server:
+BYadet sells nothing itself. Every result links to the shop's own product page.
+
+## Status
+
+- **Done:** home page, the five-step wizard (validation, saved progress, tests), and the brand (logo, Keepsake palette).
+- **In progress:** the recommendation stream on `/result`, currently on mock data.
+- **Next:** waiting-room and results UI, the AI step that turns answers into search queries, and live search on Digikala and Snapshop.
+
+## Getting started
+
+Requires Node 22+ and [pnpm](https://pnpm.io).
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Command | What it does |
+| --- | --- |
+| `pnpm dev` | Start the dev server |
+| `pnpm build` / `pnpm start` | Production build and serve |
+| `pnpm test` | Run the unit tests (vitest) |
+| `pnpm typecheck` | Type-check with `tsc` |
+| `pnpm lint` | Lint with ESLint |
+| `pnpm fill` | Click through the wizard in an open Chrome tab (needs Chrome started with `--remote-debugging-port=9222`) |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Stack
 
-## Learn More
+Next.js 16 (App Router, React 19, React Compiler) · Tailwind CSS v4 · zustand · zod · vitest · Vazirmatn font.
 
-To learn more about Next.js, take a look at the following resources:
+## Docs
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `docs/01`–`docs/10`: the product spec (vision, users, wizard, system flow, waiting room, results, scope, metrics, risks, glossary).
+- `docs/wizard-gaps.md`: the wizard checklist.
+- `docs/brand/`: logo and palette boards.
+- `CLAUDE.md`: architecture and code conventions.

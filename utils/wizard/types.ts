@@ -30,7 +30,7 @@ export type WizardStepId = (typeof WIZARD_STEPS)[number];
 export interface TargetDraft {
     ageRange: AgeRange | null;
     gender: Gender | null;
-    relationship: Relationship | null;
+    relationships: Relationship[];
     freeText: string;
 }
 

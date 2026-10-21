@@ -7,7 +7,7 @@ export const field = tv({
         control: [
             "w-full rounded-card border bg-surface text-ink placeholder:text-muted/70",
             "border-line transition-colors duration-150",
-            "hover:border-muted focus:border-accent focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/30",
+            "hover:border-muted focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/50",
             "disabled:cursor-not-allowed disabled:opacity-50",
         ],
         message: "text-sm text-muted",

@@ -1,6 +1,6 @@
 import { t } from "@/i18n";
 import { ChipGroup, Textarea } from "@/components/ui";
-import { AGE_RANGES, FREE_TEXT_MAX, FREE_TEXT_MIN, GENDERS, RELATIONSHIPS } from "@/utils/wizard/options";
+import { AGE_RANGES, FREE_TEXT_MAX, GENDERS, RELATIONSHIPS } from "@/utils/wizard/options";
 import { useStepDraft, useStepErrors } from "@/utils/wizard/store";
 
 export default function TargetStep() {
@@ -20,7 +20,7 @@ export default function TargetStep() {
                 chips={AGE_RANGES}
                 value={target.ageRange ? [target.ageRange] : []}
                 onChange={([ageRange = null]) => patch({ ageRange })}
-                error={errors.ageRange && t(errors.ageRange)}
+                error={errors.step && t(errors.step)}
             />
             <ChipGroup
                 group="gender"
@@ -28,15 +28,14 @@ export default function TargetStep() {
                 chips={GENDERS}
                 value={target.gender ? [target.gender] : []}
                 onChange={([gender = null]) => patch({ gender })}
-                error={errors.gender && t(errors.gender)}
             />
             <ChipGroup
                 group="relationship"
                 label={t("wizard.target.relationship")}
                 chips={RELATIONSHIPS}
-                value={target.relationship ? [target.relationship] : []}
-                onChange={([relationship = null]) => patch({ relationship })}
-                error={errors.relationship && t(errors.relationship)}
+                value={target.relationships}
+                multiSelect
+                onChange={(relationships) => patch({ relationships })}
             />
 
             <Textarea
@@ -44,7 +43,7 @@ export default function TargetStep() {
                 label={t("wizard.target.freeText")}
                 placeholder={t("wizard.target.placeholder")}
                 hint={t("common.optional")}
-                error={errors.freeText && t(errors.freeText, { min: FREE_TEXT_MIN })}
+                error={errors.freeText && t(errors.freeText)}
                 maxLength={FREE_TEXT_MAX}
                 onChange={(e) => patch({ freeText: e.target.value })}
             />

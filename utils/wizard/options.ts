@@ -61,9 +61,12 @@ export const OWNS_BY_INTEREST: Record<(typeof INTERESTS)[number], readonly (type
     fashion: [],
 };
 
+export const ownsForInterests = (interests: readonly (typeof INTERESTS)[number][]) => [
+    ...new Set(interests.flatMap((interest) => OWNS_BY_INTEREST[interest])),
+];
+
 export const BUDGET_FLOOR = 50_000;
 export const BUDGET_CEILING = 30_000_000;
-export const FREE_TEXT_MIN = 5;
 export const FREE_TEXT_MAX = 500;
 
 export const BUDGET_PRESETS = [
