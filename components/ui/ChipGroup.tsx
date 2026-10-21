@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { chipLabel, type Dictionary } from "@/i18n";
 import { Chip } from "./Chip";
 
@@ -22,6 +23,8 @@ export function ChipGroup<T extends string>({
     error,
     onChange,
 }: Props<T>) {
+    const errorId = useId();
+
     const toggle = (id: T) => {
         if (value.includes(id)) {
             onChange(value.filter((v) => v !== id));
@@ -31,7 +34,7 @@ export function ChipGroup<T extends string>({
     };
 
     return (
-        <fieldset className="flex flex-col gap-3">
+        <fieldset className="flex flex-col gap-3" aria-describedby={error ? errorId : undefined}>
             <legend className={`text-sm font-medium ${error ? "text-warn" : "text-muted"}`}>
                 <span className="inline-block">{label}</span>
                 {hint && <span className="ms-1 text-xs font-normal text-muted/80">{hint}</span>}
@@ -43,7 +46,11 @@ export function ChipGroup<T extends string>({
                     </Chip>
                 ))}
             </div>
-            {error && <p className="text-sm text-warn">{error}</p>}
+            {error && (
+                <p id={errorId} role="alert" className="text-sm text-warn">
+                    {error}
+                </p>
+            )}
         </fieldset>
     );
 }

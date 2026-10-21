@@ -35,10 +35,17 @@ const slider = tv({
                 root: "opacity-50",
             },
         },
+        empty: {
+            true: {
+                fill: "hidden",
+                input: "[--thumb-color:var(--muted)]",
+            },
+        },
     },
     defaultVariants: {
         size: "md",
         disabled: false,
+        empty: false,
     },
 });
 
@@ -75,12 +82,13 @@ export function RangeSlider<T extends SliderValue>({
     showValues = true,
     size,
     disabled,
+    empty,
     className,
     id,
 }: RangeSliderProps<T>) {
     const generatedId = useId();
     const baseId = id ?? generatedId;
-    const styles = slider({ size, disabled, className });
+    const styles = slider({ size, disabled, empty, className });
     const isRange = Array.isArray(value);
     const [low, high] = isRange ? value : [min, value];
 
@@ -117,7 +125,7 @@ export function RangeSlider<T extends SliderValue>({
                             {label}
                         </label>
                     )}
-                    {showValues && (
+                    {showValues && !empty && (
                         <span className={styles.values()} dir="ltr">
                             {isRange ? `${formatValue(low)} – ${formatValue(high)}` : formatValue(high)}
                         </span>

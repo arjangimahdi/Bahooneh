@@ -5,7 +5,7 @@ export const button = tv({
     base: [
         "inline-flex cursor-pointer items-center justify-center gap-2 rounded-full font-semibold select-none",
         "border transition duration-150",
-        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
         "disabled:cursor-not-allowed disabled:opacity-50",
     ],
     variants: {

@@ -26,7 +26,9 @@ export default function Page() {
 
     return (
         <div>
-            <pre>{JSON.stringify(payload)}</pre>
+            <pre className="text-wrap font-mono p-3 bg-olive-600 rounded-2xl" dir="ltr">
+                {JSON.stringify(payload)}
+            </pre>
         </div>
     );
 }

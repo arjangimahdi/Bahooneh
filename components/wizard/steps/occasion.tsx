@@ -1,6 +1,6 @@
 import { t } from "@/i18n";
 import { ChipGroup, Textarea } from "@/components/ui";
-import { FREE_TEXT_MAX, FREE_TEXT_MIN, OCCASIONS, VIBES } from "@/utils/wizard/options";
+import { FREE_TEXT_MAX, OCCASIONS, VIBES } from "@/utils/wizard/options";
 import { useStepDraft, useStepErrors } from "@/utils/wizard/store";
 
 export default function OccasionStep() {
@@ -20,7 +20,7 @@ export default function OccasionStep() {
                 chips={OCCASIONS}
                 value={occasion.occasion ? [occasion.occasion] : []}
                 onChange={([value = null]) => patch({ occasion: value })}
-                error={errors.occasion && t(errors.occasion)}
+                error={errors.step && t(errors.step)}
             />
             <ChipGroup
                 group="vibe"
@@ -38,7 +38,7 @@ export default function OccasionStep() {
                 label={t("wizard.occasion.freeText")}
                 placeholder={t("wizard.occasion.placeholder")}
                 hint={t("common.optional")}
-                error={errors.freeText && t(errors.freeText, { min: FREE_TEXT_MIN })}
+                error={errors.freeText && t(errors.freeText)}
                 maxLength={FREE_TEXT_MAX}
                 onChange={(e) => patch({ freeText: e.target.value })}
             />

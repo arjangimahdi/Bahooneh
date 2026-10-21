@@ -4,9 +4,14 @@ import { wizardSchema } from "@/utils/wizard/schema";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
+  const body = await request.json().catch(() => null)
+  const parsed = wizardSchema.safeParse(body)
+  if (!parsed.success) {
+    return NextResponse.json({ error: 'invalid_payload', issues: parsed.error.issues }, { status: 400 })
+  }
+
   try {
-    const body = await request.json().catch(() => null)
-    const payload = wizardSchema.parse(body)
+    const payload = parsed.data
     const timeoutMs = 25_000
     const controller = new AbortController()
     setTimeout(() => { controller.abort(new Error('timeout_reached')) }, timeoutMs)
@@ -24,7 +29,6 @@ export async function POST(request: NextRequest) {
         for await (const event of recommend(payload, controller.signal)) send(event)
       },
       cancel(resonse) {
-
       }
     })
 

@@ -1,37 +1,42 @@
 @import "tailwindcss";
 
-/* Bahane palette (spec §11): warm neutrals with a pomegranate accent that clears WCAG AA on the CTA. */
 :root {
   color-scheme: light;
-  --paper: #faf3ef;
-  --surface: #fffcfa;
-  --ink: #33403f;
-  --muted: #5e6967;
-  --line: #e6dcd5;
-  --accent: #a83e5c;
-  --accent-ink: #ffffff;
-  --accent-soft: #f7e3e9;
-  --secondary: #45614a;
-  --secondary-soft: #e4ede6;
-  --warn: #934c22;
-  --warn-soft: #f7e6dc;
+  --paper: #ffe8d6;
+  --surface: #fff6ee;
+  --ink: #202c39;
+  --ink-raised: #283845;
+  --muted: #4f5a64;
+  --line: #ebcdb6;
+  --accent: #f29559;
+  --accent-ink: #202c39;
+  --accent-soft: #fbd3b4;
+  --secondary: #6b705c;
+  --secondary-soft: #ebe3cf;
+  --highlight: #f2d492;
+  --blossom: #f4acb7;
+  --warn: #a3352b;
+  --warn-soft: #f9d5cc;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;
-    --paper: #17120f;
-    --surface: #1f1815;
-    --ink: #f1e8e2;
-    --muted: #b8a99f;
-    --line: #352b26;
-    --accent: #e28ca0;
-    --accent-ink: #2a0f17;
-    --accent-soft: #3a1f28;
-    --secondary: #9fc2a0;
-    --secondary-soft: #1f2d21;
-    --warn: #e2a467;
-    --warn-soft: #33241a;
+    --paper: #202c39;
+    --surface: #283845;
+    --ink: #ffe8d6;
+    --ink-raised: #34485a;
+    --muted: #c9b6a6;
+    --line: #3a4d5f;
+    --accent: #f29559;
+    --accent-ink: #202c39;
+    --accent-soft: #4b3a34;
+    --secondary: #a9ae97;
+    --secondary-soft: #33403a;
+    --highlight: #f2d492;
+    --blossom: #f4acb7;
+    --warn: #f08a7a;
+    --warn-soft: #4a2c2e;
   }
 }
 
@@ -39,6 +44,7 @@
   --color-paper: var(--paper);
   --color-surface: var(--surface);
   --color-ink: var(--ink);
+  --color-ink-raised: var(--ink-raised);
   --color-muted: var(--muted);
   --color-line: var(--line);
   --color-accent: var(--accent);
@@ -46,6 +52,8 @@
   --color-accent-soft: var(--accent-soft);
   --color-secondary: var(--secondary);
   --color-secondary-soft: var(--secondary-soft);
+  --color-highlight: var(--highlight);
+  --color-blossom: var(--blossom);
   --color-warn: var(--warn);
   --color-warn-soft: var(--warn-soft);
   --font-sans: var(--font-vazirmatn), system-ui, sans-serif;
@@ -93,7 +101,7 @@ input[type="number"] {
   height: var(--thumb);
   border-radius: 9999px;
   border: 0;
-  background: var(--accent);
+  background: var(--thumb-color, var(--accent));
   pointer-events: auto;
   cursor: pointer;
 }
@@ -102,7 +110,7 @@ input[type="number"] {
   height: var(--thumb);
   border-radius: 9999px;
   border: 0;
-  background: var(--accent);
+  background: var(--thumb-color, var(--accent));
   pointer-events: auto;
   cursor: pointer;
 }
