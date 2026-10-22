@@ -1,5 +1,5 @@
 import { recommend } from "@/utils/pipe/recommend";
-import { RecommendEvent } from "@/utils/pipe/events";
+import { encodeEvent, isTerminalEvent, RecommendEvent } from "@/utils/pipe/events";
 import { wizardSchema } from "@/utils/wizard/schema";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,21 +14,38 @@ export async function POST(request: NextRequest) {
     const payload = parsed.data
     const timeoutMs = 25_000
     const controller = new AbortController()
-    setTimeout(() => { controller.abort(new Error('timeout_reached')) }, timeoutMs)
-    request.signal.addEventListener('abort', () => controller.abort(new Error(request.signal.reason)))
+    const timer = setTimeout(() => { controller.abort(new Error('timeout_reached')) }, timeoutMs)
+    request.signal.addEventListener('abort', () => controller.abort(request.signal.reason))
 
-    const closed = false
+    let closed = false
     const encoder = new TextEncoder()
     const stream = new ReadableStream<Uint8Array>({
       async start(sink) {
         const send = (event: RecommendEvent) => {
-          if (!closed) sink.enqueue(encoder.encode(JSON.stringify(event) + " \n"))
+          if (!closed) sink.enqueue(encoder.encode(encodeEvent(event)))
         }
         send({ type: 'start', timeoutMs })
 
-        for await (const event of recommend(payload, controller.signal)) send(event)
+        try {
+          for await (const event of recommend(payload, controller.signal)) {
+            send(event)
+            if (isTerminalEvent(event)) break
+          }
+        } catch (error) {
+          console.error("[api/recommend] stream failed", error);
+          send({ type: "error", code: "internal" });
+        } finally {
+          clearTimeout(timer);
+          if (!closed) {
+            closed = true
+            sink.close();
+          }
+        }
       },
-      cancel(resonse) {
+      cancel() {
+        closed = true
+        controller.abort(new Error("client disconnected"));
+        clearTimeout(timer);
       }
     })
 

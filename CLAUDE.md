@@ -45,10 +45,22 @@ Current state:
 
 - **Home** (`app/page.tsx`) and the root layout with the brand header.
 - **Wizard** (`/wizard`) is complete. `components/wizard/WizardShell.tsx` renders the five step components from `components/wizard/steps/`, owns navigation and submit, and pushes to `/result`. State lives in a zustand store (`utils/wizard/store.ts`) persisted to `sessionStorage` (key `byadet-wizard`, versioned with a `migrate`; bump the version when the draft shape changes). Validation is zod in `utils/wizard/schema.ts`: per-step schemas whose issue messages are `TKey`s, so `t(error)` renders them. Steps 1–3 pass with any chip OR free text; budget min/max are required hard limits. Option ids live in `utils/wizard/options.ts`. Open gaps are tracked in `docs/wizard-gaps.md`.
-- **Recommend pipeline** is scaffolded on mock data: `POST /api/recommend` (`app/api/recommend/route.ts`) validates with `wizardSchema` (400 on a bad payload) and streams NDJSON `RecommendEvent`s (`utils/pipe/types.ts`) from the async generator in `utils/pipe/recommend.ts`; `hooks/useRecommend.ts` reads the stream on `/result`.
+- **Recommend pipeline** is scaffolded on mock data: `POST /api/recommend` (`app/api/recommend/route.ts`) validates with `wizardSchema` (400 on a bad payload) and streams NDJSON `RecommendEvent`s from the async generator in `utils/pipe/recommend.ts`; `hooks/useRecommend.ts` reads the stream on `/result`. The event contract lives in `utils/pipe/events.ts` (`RecommendEvent`, `STAGES`, `ERROR_CODES`, `encodeEvent`, `isTerminalEvent`), the domain types in `utils/pipe/types.ts` (`Product`, `ResultItem`, `PARTNER_IDS`), and the zod checker in `utils/pipe/schema.ts` (`recommendEventSchema`, `parseEvent`). See "Stream message rules" below.
 - **Not built yet:** the waiting room (`components/result/Lobby.tsx`), the results view (`ProductsView.tsx`), the real AI layer, and the partner scrapers. `i18n/fa.ts` already contains their copy, so it's a good map of what's planned.
 
 UI primitives (`Button`, `Chip`, `ChipGroup`, `Input`, `Textarea`, `RangeSlider`) live in `components/ui/` and use `tailwind-variants`.
+
+### Stream message rules
+
+The `/api/recommend` stream is a contract between server and client. Do not break these:
+
+1. **One event per line, written only by `encodeEvent`.** A line is `JSON.stringify(event) + "\n"`: exactly `"\n"`, no trailing space, no other newlines. Never build lines by hand.
+2. **Read only through `parseEvent`.** Never `JSON.parse(line) as RecommendEvent` or annotate a `JSON.parse` result as an event. `parseEvent` never throws and returns `null` for blank, broken or unknown lines; skip those.
+3. **Imports flow one way: `types.ts` ← `events.ts` ← `schema.ts`.** `types.ts` imports nothing from the pipe, `events.ts` uses only `import type` from `types.ts` and never imports zod, and only code that reads untrusted data imports `schema.ts`.
+4. **Type and schema change together.** `recommendEventSchema` ends in `satisfies z.ZodType<RecommendEvent>`, so a field added to the type breaks the build until the schema matches. Fields added only to the schema are not caught by the compiler; the tests in `utils/pipe/events.test.ts` are. Adding a stage or error code means updating `STAGES`/`ERROR_CODES`, the union, the schema, `SAMPLES` in the tests, and `waiting.stages.*` in `fa.ts` (checked by `utils/pipe/stageCopy.test.ts`).
+5. **Every stream ends with exactly one terminal event, `result` or `error`** (`isTerminalEvent`), and nothing is sent after it. A single shop failing is a `partner_failed` event followed by a partial `result`, never an `error` (spec: one partner failing must not fail the request).
+
+Product ids are `"<partner>:<partnerProductId>"`, and `Product.url` is the canonical page without tracking; affiliate links go in `ResultItem.affiliateUrl`.
 
 ### i18n — every user-facing string goes through `t()`
 
