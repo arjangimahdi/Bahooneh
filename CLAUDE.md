@@ -26,6 +26,7 @@ pnpm build        # next build
 pnpm start
 pnpm lint         # eslint (flat config, eslint-config-next core-web-vitals + typescript)
 pnpm typecheck    # tsc --noEmit
+pnpm format       # prettier --write . (format:check to verify)
 pnpm test         # vitest run
 pnpm vitest run path/to/file.test.ts   # single test file
 pnpm vitest -t "test name"             # single test by name
@@ -81,7 +82,7 @@ Because the app is RTL, prefer logical/direction-agnostic utilities (`ps-`, `pe-
 
 ## Conventions
 
-- Components and `utils/wizard/` use 4-space indentation; `i18n/`, `utils/pipe/`, `hooks/` and the API route use 2-space. Match the file you're in.
+- Formatting is Prettier (`.prettierrc.json`): 4-space indentation everywhere, double quotes, semicolons, trailing commas (es5), 120-char lines. Run `pnpm format` before committing; `eslint-config-prettier` keeps ESLint out of style questions. Markdown and `docs/` are not formatted.
 - Server components by default; only add `"use client"` where state/effects are needed (the wizard and waiting room will need it).
 - Do not use any comments inside code.
 

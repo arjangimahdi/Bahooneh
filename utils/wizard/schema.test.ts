@@ -40,9 +40,7 @@ describe("occasionSchema", () => {
     });
 
     it("does not count a vibe alone", () => {
-        expect(messages(occasionSchema.safeParse({ ...empty, vibe: ["playful"] }))).toEqual([
-            "wizard.occasion.error",
-        ]);
+        expect(messages(occasionSchema.safeParse({ ...empty, vibe: ["playful"] }))).toEqual(["wizard.occasion.error"]);
     });
 
     it.each([

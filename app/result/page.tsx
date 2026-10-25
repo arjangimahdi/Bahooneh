@@ -18,7 +18,7 @@ export default function Page() {
 
     const payload = useMemo(() => draftToPayload(draft), [draft]);
 
-    const {} = useRecommend(payload);
+    const { stage, results } = useRecommend(payload);
 
     useEffect(() => {
         if (!payload) router.push("/wizard");
