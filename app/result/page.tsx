@@ -18,17 +18,29 @@ export default function Page() {
 
     const payload = useMemo(() => draftToPayload(draft), [draft]);
 
-    const { stage, results } = useRecommend(payload);
+    const { stage, results, error, retry } = useRecommend(payload);
 
     useEffect(() => {
         if (!payload) router.push("/wizard");
     }, [router, payload]);
 
     return (
-        <div>
+        <div className="flex flex-col gap-4">
             <pre className="text-wrap font-mono p-3 bg-olive-600 rounded-2xl" dir="ltr">
                 {JSON.stringify(payload)}
             </pre>
+            {error && (
+                <div className="flex items-center gap-3 font-mono" dir="ltr">
+                    <span className="text-warn">error: {error}</span>
+                    <button
+                        type="button"
+                        onClick={retry}
+                        className="cursor-pointer rounded-full border border-line px-4 py-1"
+                    >
+                        Retry
+                    </button>
+                </div>
+            )}
         </div>
     );
 }

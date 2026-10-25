@@ -12,9 +12,20 @@ export interface StructuredLLM {
     generate: <T>(options: GenerateOptions<T>) => Promise<T>;
 }
 
+export const LLM_ERROR_KINDS = [
+    "config",
+    "quota_exhausted",
+    "rate_limited",
+    "unreachable",
+    "server_error",
+    "bad_output",
+] as const;
+export type LLMErrorKind = (typeof LLM_ERROR_KINDS)[number];
+
 export class LLMError extends Error {
     constructor(
         message: string,
+        readonly kind: LLMErrorKind,
         readonly cause?: unknown
     ) {
         super(message);

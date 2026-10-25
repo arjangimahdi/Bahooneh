@@ -13,7 +13,7 @@ export function llm(): StructuredLLM {
     }
 
     if (!instance) {
-        throw new Error(`Unknown AI_PROVIDER "${provider}" (expected "ollama", "openrouter" or "anthropic")`);
+        throw new Error(`Unknown AI_PROVIDER "${provider}" (expected "iranrouter")`);
     }
 
     return instance;

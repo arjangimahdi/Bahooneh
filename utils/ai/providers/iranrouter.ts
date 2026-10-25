@@ -1,10 +1,17 @@
 import z from "zod";
-import { StructuredLLM, GenerateOptions, LLMError } from "../provider";
+import { StructuredLLM, GenerateOptions, LLMError, type LLMErrorKind } from "../provider";
 
 interface ChatCompletion {
-    choices?: { message?: { content?: string }; finish_reason?: string }[];
+    choices?: { message?: { content?: string } }[];
     error?: { message?: string };
 }
+
+const kindForStatus = (status: number): LLMErrorKind => {
+    if (status === 402) return "quota_exhausted";
+    if (status === 429) return "rate_limited";
+    if (status >= 500) return "server_error";
+    return "config";
+};
 
 export function createIranRouter(): StructuredLLM {
     const baseUrl = process.env.IRANROUTER_BASE_URL;
@@ -15,10 +22,11 @@ export function createIranRouter(): StructuredLLM {
     return {
         id,
         async generate<T>({ system, user, schema, signal }: GenerateOptions<T>): Promise<T> {
-            if (!apiKey) throw new LLMError("IRANROUTER_API_KEY is not set");
+            if (!baseUrl) throw new LLMError("IRANROUTER_BASE_URL is not set", "config");
+            if (!apiKey) throw new LLMError("IRANROUTER_API_KEY is not set", "config");
+            if (!modelName) throw new LLMError("AI_MODEL is not set", "config");
 
             let res: Response;
-
             try {
                 res = await fetch(`${baseUrl}/chat/completions`, {
                     method: "POST",
@@ -43,24 +51,30 @@ export function createIranRouter(): StructuredLLM {
                 });
             } catch (error) {
                 if (signal?.aborted) throw error;
-                throw new LLMError("iranrouter unreachable", error);
+                throw new LLMError("iranrouter unreachable", "unreachable", error);
             }
 
             const body = (await res.json().catch(() => ({}))) as ChatCompletion;
-            if (!res.ok || body.error) {
-                throw new LLMError(`iranrouter error ${res.status}: ${body.error?.message ?? res.statusText}`);
+            if (!res.ok) {
+                const detail = body.error?.message;
+                const message = detail ? `iranrouter error ${res.status}: ${detail}` : `iranrouter error ${res.status}`;
+                throw new LLMError(message, kindForStatus(res.status));
             }
 
-            const content = body.choices?.[0]?.message?.content?.trim() ?? "";
-            let json;
+            const content = body.choices?.[0]?.message?.content?.trim();
+            if (!content) throw new LLMError("iranrouter returned no content", "bad_output");
+
+            let json: unknown;
             try {
                 json = JSON.parse(content);
             } catch (error) {
-                throw new LLMError("iranrouter returned non-JSON content", error);
+                throw new LLMError("iranrouter returned non-JSON content", "bad_output", error);
             }
-            console.log('json', json)
+
             const parsed = schema.safeParse(json);
-            if (!parsed.success) throw new LLMError("iranrouter output failed schema validation", parsed.error);
+            if (!parsed.success) {
+                throw new LLMError("iranrouter output failed schema validation", "bad_output", parsed.error);
+            }
             return parsed.data;
         },
     };

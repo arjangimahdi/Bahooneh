@@ -36,7 +36,7 @@ export async function* recommend(payload: WizardPayload, signal: AbortSignal): A
 
         yield { type: "result", items: MOCK_ITEMS, failedPartners: [] };
     } catch (error) {
-        console.error("[pipe/recommend] failed", error);
+        if (!signal.aborted) console.error("[pipe/recommend] failed", error);
         yield { type: "error", code: toErrorCode(error, signal) };
     }
 }
