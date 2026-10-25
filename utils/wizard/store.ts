@@ -112,7 +112,7 @@ export const useWizardStore = create<WizardStore>()(
                     }
 
                     return { draft, errors: { ...state.errors, [stepId]: {} } };
-                })
+                }),
         }),
         {
             name: "byadet-wizard",
@@ -137,7 +137,7 @@ export const useWizardStore = create<WizardStore>()(
             }),
         }
     )
-)
+);
 
 export const useCurrentStepId = () => useWizardStore((state) => WIZARD_STEPS[state.currentStepIndex]);
 
@@ -150,5 +150,4 @@ export const useStepDraft = <S extends WizardStepId>(stepId: S) => {
 
 const NO_ERRORS: StepErrors = {};
 
-export const useStepErrors = (stepId: WizardStepId) =>
-    useWizardStore((state) => state.errors[stepId] ?? NO_ERRORS);
+export const useStepErrors = (stepId: WizardStepId) => useWizardStore((state) => state.errors[stepId] ?? NO_ERRORS);
