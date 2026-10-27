@@ -28,7 +28,6 @@ const startEventSchema = z.object({
 
 const understandingStageSchema = z.object({
     type: z.literal("stage"),
-    recipientLabel: z.string(),
     stage: z.literal("understanding"),
 });
 
@@ -36,6 +35,7 @@ const ideatingStageSchema = z.object({
     type: z.literal("stage"),
     stage: z.literal("ideating"),
     categoryCount: z.number().int().nonnegative(),
+    recipientLabel: z.string(),
 });
 
 const fetchingStageSchema = z.object({

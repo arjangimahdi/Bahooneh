@@ -5,8 +5,8 @@ import { parseEvent } from "./schema";
 
 const SAMPLES: RecommendEvent[] = [
     { type: "start", timeoutMs: 25_000 },
-    { type: "stage", stage: "understanding", recipientLabel: "دوستت" },
-    { type: "stage", stage: "ideating", categoryCount: 4 },
+    { type: "stage", stage: "understanding" },
+    { type: "stage", stage: "ideating", categoryCount: 4, recipientLabel: "دوستت" },
     { type: "stage", stage: "fetching", partners: ["digikala", "snapshop"] },
     { type: "stage", stage: "filtering", candidateCount: 37 },
     { type: "stage", stage: "assembling" },
@@ -52,7 +52,7 @@ describe("garbage is rejected", () => {
         '"hello"',
         '{"type":"nope"}',
         '{"type":"stage"}',
-        '{"type":"stage","stage":"understanding"}',
+        '{"type":"stage","stage":"ideating","categoryCount":4}',
         '{"type":"stage","stage":"fetching"}',
         '{"type":"stage","stage":"fetching","partners":["amazon"]}',
         '{"type":"start","timeoutMs":-5}',

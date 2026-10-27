@@ -20,7 +20,7 @@ describe("targetSchema", () => {
     it.each([
         ["age range", { ageRange: "30s" }],
         ["gender", { gender: "female" }],
-        ["relationships", { relationships: ["friend", "colleague"] }],
+        ["relationship", { relationship: "friend" }],
         ["free text only", { freeText: "همکار قدیمی" }],
         ["a one-word note", { freeText: "دوست" }],
     ])("passes with %s", (_, patch) => {
@@ -28,7 +28,7 @@ describe("targetSchema", () => {
     });
 
     it("rejects an unknown relationship id", () => {
-        expect(targetSchema.safeParse({ ...empty, relationships: ["stranger"] }).success).toBe(false);
+        expect(targetSchema.safeParse({ ...empty, relationship: "stranger" }).success).toBe(false);
     });
 });
 

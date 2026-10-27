@@ -19,7 +19,7 @@ export const emptyDraft: WizardDraft = {
     target: {
         ageRange: null,
         gender: null,
-        relationships: [],
+        relationship: null,
         freeText: "",
     },
     occasion: {
@@ -116,17 +116,17 @@ export const useWizardStore = create<WizardStore>()(
         }),
         {
             name: "byadet-wizard",
-            version: 2,
+            version: 3,
             storage: createJSONStorage(() => sessionStorage),
             migrate: (persisted, version) => {
                 const state = persisted as Pick<WizardState, "draft" | "currentStepIndex">;
-                if (version < 2) {
-                    const { relationship, ...target } = state.draft.target as TargetDraft & {
-                        relationship?: Relationship | null;
+                if (version === 2) {
+                    const { relationships, ...target } = state.draft.target as TargetDraft & {
+                        relationships?: Relationship[];
                     };
                     state.draft = {
                         ...state.draft,
-                        target: { ...target, relationships: relationship ? [relationship] : [] },
+                        target: { ...target, relationship: relationships?.[0] ?? null },
                     };
                 }
                 return state;

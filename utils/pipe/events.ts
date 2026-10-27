@@ -11,8 +11,8 @@ export type ResultEvent = Extract<RecommendEvent, { type: "result" }>;
 
 export type RecommendEvent =
     | { type: "start"; timeoutMs: number }
-    | { type: "stage"; stage: "understanding"; recipientLabel: string }
-    | { type: "stage"; stage: "ideating"; categoryCount: number }
+    | { type: "stage"; stage: "understanding" }
+    | { type: "stage"; stage: "ideating"; categoryCount: number; recipientLabel: string }
     | { type: "stage"; stage: "fetching"; partners: PartnerId[] }
     | { type: "stage"; stage: "filtering"; candidateCount: number }
     | { type: "stage"; stage: "assembling" }

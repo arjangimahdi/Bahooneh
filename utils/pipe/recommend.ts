@@ -1,8 +1,10 @@
 import { WizardPayload } from "../wizard/schema";
-import { MOCK_ITEMS } from "./mock-products";
 import { ErrorCode, RecommendEvent } from "./events";
 import { getLLMOutput } from "../ai/query";
 import { LLMError } from "../ai/provider";
+import { assembleResults, filterCandidates, SIMULATED_PARTNERS, simulateFetch } from "./simulate";
+
+const SIM_DELAY = { ideating: 1000, fetching: 4500, filtering: 800, assembling: 500 };
 
 const sleep = (ms: number, signal: AbortSignal) =>
     new Promise<void>((resolve, reject) => {
@@ -26,15 +28,31 @@ const toErrorCode = (error: unknown, signal: AbortSignal): ErrorCode => {
 
 export async function* recommend(payload: WizardPayload, signal: AbortSignal): AsyncGenerator<RecommendEvent> {
     try {
-        yield { type: "stage", stage: "understanding", recipientLabel: "friend" };
-        const data = await getLLMOutput(payload, signal);
+        yield { type: "stage", stage: "understanding" };
+        const { recipient_label, intents } = await getLLMOutput(payload, signal);
         signal.throwIfAborted();
 
-        yield { type: "stage", stage: "ideating", categoryCount: 10 };
+        yield {
+            type: "stage",
+            stage: "ideating",
+            categoryCount: intents.length,
+            recipientLabel: recipient_label,
+        };
+        await sleep(SIM_DELAY.ideating, signal);
 
-        await sleep(3000, signal);
+        yield { type: "stage", stage: "fetching", partners: SIMULATED_PARTNERS };
+        await sleep(SIM_DELAY.fetching, signal);
+        const candidates = simulateFetch(intents, payload.budget);
 
-        yield { type: "result", items: MOCK_ITEMS, failedPartners: [] };
+        yield { type: "stage", stage: "filtering", candidateCount: candidates.length };
+        await sleep(SIM_DELAY.filtering, signal);
+        const kept = filterCandidates(candidates, payload.budget);
+
+        yield { type: "stage", stage: "assembling" };
+        await sleep(SIM_DELAY.assembling, signal);
+        const items = assembleResults(kept, recipient_label, payload.budget);
+
+        yield { type: "result", items, failedPartners: [] };
     } catch (error) {
         if (!signal.aborted) console.error("[pipe/recommend] failed", error);
         yield { type: "error", code: toErrorCode(error, signal) };
