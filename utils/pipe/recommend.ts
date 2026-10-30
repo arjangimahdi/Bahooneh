@@ -2,23 +2,10 @@ import { WizardPayload } from "../wizard/schema";
 import { ErrorCode, RecommendEvent } from "./events";
 import { getLLMOutput } from "../ai/query";
 import { LLMError } from "../ai/provider";
+import { sleep } from "../partners/http";
 import { assembleResults, filterCandidates, SIMULATED_PARTNERS, simulateFetch } from "./simulate";
 
 const SIM_DELAY = { ideating: 1000, fetching: 4500, filtering: 800, assembling: 500 };
-
-const sleep = (ms: number, signal: AbortSignal) =>
-    new Promise<void>((resolve, reject) => {
-        signal.throwIfAborted();
-        const timer = setTimeout(resolve, ms);
-        signal.addEventListener(
-            "abort",
-            () => {
-                clearTimeout(timer);
-                reject(signal.reason);
-            },
-            { once: true }
-        );
-    });
 
 const toErrorCode = (error: unknown, signal: AbortSignal): ErrorCode => {
     if (signal.aborted) return "timeout";

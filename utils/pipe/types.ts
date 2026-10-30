@@ -8,6 +8,8 @@ export interface Product {
     imageUrl: string | null;
     price: number;
     url: string;
+    rating?: number;
+    reviewCount?: number;
     available: boolean;
     category?: string;
 }
