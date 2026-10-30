@@ -33,9 +33,8 @@ export default function TargetStep() {
                 group="relationship"
                 label={t("wizard.target.relationship")}
                 chips={RELATIONSHIPS}
-                value={target.relationships}
-                multiSelect
-                onChange={(relationships) => patch({ relationships })}
+                value={target.relationship ? [target.relationship] : []}
+                onChange={([relationship = null]) => patch({ relationship })}
             />
 
             <Textarea

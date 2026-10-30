@@ -1,11 +1,14 @@
 "use client";
 
+import { ErrorState } from "@/components/result/ErrorState";
+import { Lobby } from "@/components/result/Lobby";
+import { ProductsView } from "@/components/result/ProductsView";
 import { useRecommend } from "@/hooks/useRecommend";
 import { WizardPayload, wizardSchema } from "@/utils/wizard/schema";
 import { useWizardStore } from "@/utils/wizard/store";
 import { WizardDraft } from "@/utils/wizard/types";
 import { useRouter } from "next/navigation";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const draftToPayload = (draft: WizardDraft): WizardPayload | null => {
     const result = wizardSchema.safeParse(draft);
@@ -13,34 +16,39 @@ const draftToPayload = (draft: WizardDraft): WizardPayload | null => {
 };
 
 export default function Page() {
+    const [waitDone, setWaitDone] = useState<boolean>(false);
+
     const router = useRouter();
     const draft = useWizardStore((state) => state.draft);
 
     const payload = useMemo(() => draftToPayload(draft), [draft]);
 
-    const { stage, results, error, retry } = useRecommend(payload);
+    const { timeoutMs, categoryCount, partners, failedPartners, serverStage, results, error, retry } =
+        useRecommend(payload);
+
+    const onComplete = useCallback(() => {
+        setWaitDone(true);
+    }, []);
+    const onRetry = useCallback(() => {
+        setWaitDone(false);
+        retry();
+    }, [retry]);
 
     useEffect(() => {
-        if (!payload) router.push("/wizard");
+        if (!payload) router.replace("/wizard");
     }, [router, payload]);
 
+    if (waitDone && results !== null) return <ProductsView items={results} failedPartners={failedPartners} />;
+    if (error) return <ErrorState error={error} onRetry={onRetry} />;
     return (
-        <div className="flex flex-col gap-4">
-            <pre className="text-wrap font-mono p-3 bg-olive-600 rounded-2xl" dir="ltr">
-                {JSON.stringify(payload)}
-            </pre>
-            {error && (
-                <div className="flex items-center gap-3 font-mono" dir="ltr">
-                    <span className="text-warn">error: {error}</span>
-                    <button
-                        type="button"
-                        onClick={retry}
-                        className="cursor-pointer rounded-full border border-line px-4 py-1"
-                    >
-                        Retry
-                    </button>
-                </div>
-            )}
-        </div>
+        <Lobby
+            onComplete={onComplete}
+            categoryCount={categoryCount}
+            serverStage={serverStage}
+            draft={draft}
+            finished={results !== null}
+            partners={partners}
+            timeoutMs={timeoutMs}
+        />
     );
 }

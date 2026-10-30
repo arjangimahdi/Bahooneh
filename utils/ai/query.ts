@@ -55,7 +55,7 @@ export const describeUserPayload = (p: WizardPayload): string =>
         ...section("Target", [
             line("age range", p.target.ageRange),
             line("gender", p.target.gender),
-            line("relationships", p.target.relationships),
+            line("relationship", p.target.relationship),
             free("notes", p.target.freeText),
         ]),
         ...section("Occasion", [

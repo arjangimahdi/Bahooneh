@@ -22,12 +22,12 @@ export const targetSchema = z
     .object({
         ageRange: z.enum(AGE_RANGES).nullable(),
         gender: z.enum(GENDERS).nullable(),
-        relationships: z.array(z.enum(RELATIONSHIPS)),
+        relationship: z.enum(RELATIONSHIPS).nullable(),
         freeText: optionalFreeText,
     })
     .refine(
         (value) =>
-            value.ageRange !== null || value.gender !== null || value.relationships.length > 0 || value.freeText !== "",
+            value.ageRange !== null || value.gender !== null || value.relationship !== null || value.freeText !== "",
         {
             message: "wizard.target.error",
             path: ["step"],

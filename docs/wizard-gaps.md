@@ -19,7 +19,7 @@ Legend: **[Spec]** = spec requirement, **[Ref]** = Bahane does it, **[Bug]** = i
 - **Done when:** fill half the wizard, hard refresh, and you land on the same step with your answers. Refreshing `/result` after a complete wizard does not bounce you away.
 
 ### - [x] 2. Decide the validation policy for steps 1 and 2 **[Spec]**
-- **Decision:** option (a): steps 1 and 2 are valid with any chip OR free text, shown as one step-level error; `relationship` is now multi-select (`relationships[]`).
+- **Decision:** option (a): steps 1 and 2 are valid with any chip OR free text, shown as one step-level error; `relationship` is single-select (`relationship: Relationship | null`): a recipient has one relationship to the user. It was briefly `relationships[]`; the store's v3 migration keeps the first value.
 - **Missing:** Spec 03 says step 1 needs "at least one chip OR free text" and step 2 needs "occasion chip OR free text" (non-blocking, no dead ends). Currently:
   - `targetSchema` requires `ageRange`, `gender` and `relationship` (all single-select).
   - `occasionSchema` requires an `occasion` chip; free text cannot replace it.

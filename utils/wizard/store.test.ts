@@ -21,7 +21,7 @@ const memory = vi.hoisted(() => {
 const store = () => useWizardStore.getState();
 
 const validDraft: WizardDraft = {
-    target: { ...emptyDraft.target, relationships: ["friend"] },
+    target: { ...emptyDraft.target, relationship: "friend" },
     occasion: { ...emptyDraft.occasion, occasion: "birthday" },
     interests: { ...emptyDraft.interests, interests: ["tech"] },
     antiPrefs: emptyDraft.antiPrefs,
@@ -122,13 +122,36 @@ describe("persistence", () => {
 });
 
 describe("persisted draft migration", () => {
-    it("turns a v1 single relationship into relationships[]", () => {
+    it("keeps the first of a v2 relationships[] as the single relationship", () => {
+        const { migrate } = useWizardStore.persist.getOptions();
+        const v2 = {
+            currentStepIndex: 1,
+            draft: {
+                ...emptyDraft,
+                target: { ageRange: null, gender: null, relationships: ["parent", "friend"], freeText: "" },
+            },
+        };
+        const migrated = migrate?.(v2, 2) as { draft: WizardDraft };
+        expect(migrated.draft.target).toEqual({ ...emptyDraft.target, relationship: "parent" });
+    });
+
+    it("turns an empty v2 relationships[] into null", () => {
+        const { migrate } = useWizardStore.persist.getOptions();
+        const v2 = {
+            currentStepIndex: 0,
+            draft: { ...emptyDraft, target: { ageRange: null, gender: null, relationships: [], freeText: "" } },
+        };
+        const migrated = migrate?.(v2, 2) as { draft: WizardDraft };
+        expect(migrated.draft.target.relationship).toBeNull();
+    });
+
+    it("leaves a v1 single relationship as it is", () => {
         const { migrate } = useWizardStore.persist.getOptions();
         const v1 = {
             currentStepIndex: 1,
             draft: { ...emptyDraft, target: { ageRange: null, gender: null, relationship: "parent", freeText: "" } },
         };
         const migrated = migrate?.(v1, 1) as { draft: WizardDraft };
-        expect(migrated.draft.target).toEqual({ ...emptyDraft.target, relationships: ["parent"] });
+        expect(migrated.draft.target).toEqual({ ...emptyDraft.target, relationship: "parent" });
     });
 });
