@@ -2,23 +2,11 @@ import { WizardPayload } from "../wizard/schema";
 import { ErrorCode, RecommendEvent } from "./events";
 import { getLLMOutput } from "../ai/query";
 import { LLMError } from "../ai/provider";
-import { assembleResults, filterCandidates, SIMULATED_PARTNERS, simulateFetch } from "./simulate";
+import { sleep } from "../partners/http";
+import { partners } from "../partners/shops";
+import { fetchCandidates, toResultItem } from "./fetchCandidates";
 
 const SIM_DELAY = { ideating: 1000, fetching: 4500, filtering: 800, assembling: 500 };
-
-const sleep = (ms: number, signal: AbortSignal) =>
-    new Promise<void>((resolve, reject) => {
-        signal.throwIfAborted();
-        const timer = setTimeout(resolve, ms);
-        signal.addEventListener(
-            "abort",
-            () => {
-                clearTimeout(timer);
-                reject(signal.reason);
-            },
-            { once: true }
-        );
-    });
 
 const toErrorCode = (error: unknown, signal: AbortSignal): ErrorCode => {
     if (signal.aborted) return "timeout";
@@ -38,21 +26,25 @@ export async function* recommend(payload: WizardPayload, signal: AbortSignal): A
             categoryCount: intents.length,
             recipientLabel: recipient_label,
         };
-        await sleep(SIM_DELAY.ideating, signal);
 
-        yield { type: "stage", stage: "fetching", partners: SIMULATED_PARTNERS };
-        await sleep(SIM_DELAY.fetching, signal);
-        const candidates = simulateFetch(intents, payload.budget);
+        yield { type: "stage", stage: "fetching", partners: partners.map((p) => p.id) };
+        const { candidates, failedPartners } = await fetchCandidates({
+            budget: payload.budget,
+            intents,
+            partners,
+            signal,
+        });
+
+        for (const partner of failedPartners) {
+            yield { type: "partner_failed", partner };
+        }
 
         yield { type: "stage", stage: "filtering", candidateCount: candidates.length };
-        await sleep(SIM_DELAY.filtering, signal);
-        const kept = filterCandidates(candidates, payload.budget);
+        const kept = toResultItem(candidates);
 
         yield { type: "stage", stage: "assembling" };
-        await sleep(SIM_DELAY.assembling, signal);
-        const items = assembleResults(kept, recipient_label, payload.budget);
 
-        yield { type: "result", items, failedPartners: [] };
+        yield { type: "result", items: kept, failedPartners: failedPartners };
     } catch (error) {
         if (!signal.aborted) console.error("[pipe/recommend] failed", error);
         yield { type: "error", code: toErrorCode(error, signal) };

@@ -1,3 +1,5 @@
+import { Intent } from "../ai/query";
+
 export const PARTNER_IDS = ["digikala", "snapshop", "mock"] as const;
 export type PartnerId = (typeof PARTNER_IDS)[number];
 
@@ -8,6 +10,8 @@ export interface Product {
     imageUrl: string | null;
     price: number;
     url: string;
+    rating?: number;
+    reviewCount?: number;
     available: boolean;
     category?: string;
 }
@@ -16,4 +20,14 @@ export interface ResultItem {
     product: Product;
     affiliateUrl: string;
     rationale: string;
+}
+
+export interface Candidate {
+    intent: Intent;
+    product: Product;
+}
+
+export interface OutcomeResults {
+    candidates: Candidate[];
+    failedPartners: PartnerId[];
 }

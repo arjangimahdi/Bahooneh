@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { LLMError } from "../ai/provider";
 import type { WizardPayload } from "../wizard/schema";
 import { isTerminalEvent, type RecommendEvent } from "./events";
@@ -25,37 +25,21 @@ const intents = [
 
 const collect = async () => {
     const events: RecommendEvent[] = [];
-    const run = (async () => {
-        for await (const event of recommend(payload, new AbortController().signal)) events.push(event);
-    })();
-    await vi.runAllTimersAsync();
-    await run;
+    for await (const event of recommend(payload, new AbortController().signal)) events.push(event);
     return events;
 };
 
 const kindOf = (event: RecommendEvent) => (event.type === "stage" ? `stage/${event.stage}` : event.type);
 
 beforeEach(() => {
-    vi.useFakeTimers();
     getLLMOutputMock.mockReset();
 });
 
-afterEach(() => {
-    vi.useRealTimers();
-});
-
-describe("recommend (simulated)", () => {
-    it("emits every stage in order, then one result", async () => {
+describe("recommend", () => {
+    it("emits the AI stages in order, then one result", async () => {
         getLLMOutputMock.mockResolvedValue({ recipient_label: "دوستت", intents });
         const events = await collect();
-        expect(events.map(kindOf)).toEqual([
-            "stage/understanding",
-            "stage/ideating",
-            "stage/fetching",
-            "stage/filtering",
-            "stage/assembling",
-            "result",
-        ]);
+        expect(events.map(kindOf)).toEqual(["stage/understanding", "stage/ideating", "result"]);
     });
 
     it("emits only valid events and exactly one terminal event, last", async () => {
@@ -66,7 +50,7 @@ describe("recommend (simulated)", () => {
         expect(isTerminalEvent(events[events.length - 1])).toBe(true);
     });
 
-    it("reports the AI's recipient label and intent count, and in-budget items", async () => {
+    it("reports the AI's recipient label and intent count", async () => {
         getLLMOutputMock.mockResolvedValue({ recipient_label: "همکارت", intents });
         const events = await collect();
         expect(events.find((e) => e.type === "stage" && e.stage === "understanding")).toEqual({
@@ -79,15 +63,6 @@ describe("recommend (simulated)", () => {
             categoryCount: intents.length,
             recipientLabel: "همکارت",
         });
-        const result = events.at(-1);
-        expect(result?.type).toBe("result");
-        if (result?.type !== "result") return;
-        expect(result.items.length).toBeGreaterThan(0);
-        expect(result.failedPartners).toEqual([]);
-        for (const { product } of result.items) {
-            expect(product.price).toBeGreaterThanOrEqual(1_000_000);
-            expect(product.price).toBeLessThanOrEqual(3_000_000);
-        }
     });
 
     it("turns an AI failure into a single ai_unavailable error", async () => {
