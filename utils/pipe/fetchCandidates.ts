@@ -72,22 +72,11 @@ export async function fetchCandidates(input: FetchInput): Promise<OutcomeResults
 }
 
 export function toResultItem(candidates: Candidate[]): ResultItem[] {
-    const seen = new Set<string>();
-
-    const results = candidates
-        .filter(({ product }) => {
-            if (seen.has(product.id)) return false;
-            seen.add(product.id);
-            return true;
-        })
-        .slice(0, 12)
-        .map(({ product }) => {
-            return {
-                product,
-                rationale: "",
-                affiliateUrl: byId.get(product.partner)?.affiliateUrl(product) ?? product.url,
-            };
-        });
-
-    return results;
+    return candidates.slice(0, 12).map(({ product }) => {
+        return {
+            product,
+            rationale: "",
+            affiliateUrl: byId.get(product.partner)?.affiliateUrl(product) ?? product.url,
+        };
+    });
 }

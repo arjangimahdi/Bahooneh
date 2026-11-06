@@ -2,11 +2,9 @@ import { WizardPayload } from "../wizard/schema";
 import { ErrorCode, RecommendEvent } from "./events";
 import { getLLMOutput } from "../ai/query";
 import { LLMError } from "../ai/provider";
-import { sleep } from "../partners/http";
 import { partners } from "../partners/shops";
 import { fetchCandidates, toResultItem } from "./fetchCandidates";
-
-const SIM_DELAY = { ideating: 1000, fetching: 4500, filtering: 800, assembling: 500 };
+import { applyHardFilters } from "./filters";
 
 const toErrorCode = (error: unknown, signal: AbortSignal): ErrorCode => {
     if (signal.aborted) return "timeout";
@@ -40,7 +38,8 @@ export async function* recommend(payload: WizardPayload, signal: AbortSignal): A
         }
 
         yield { type: "stage", stage: "filtering", candidateCount: candidates.length };
-        const kept = toResultItem(candidates);
+        const filtered = applyHardFilters(candidates, payload);
+        const kept = toResultItem(filtered);
 
         yield { type: "stage", stage: "assembling" };
 
