@@ -1,7 +1,25 @@
 import { describe, expect, it } from "vitest";
 import { ERROR_CODES, STAGES, encodeEvent, isTerminalEvent, type RecommendEvent } from "./events";
-import { MOCK_ITEMS } from "./mock-products";
 import { parseEvent } from "./schema";
+import type { ResultItem } from "./types";
+
+const ITEMS: ResultItem[] = [
+    {
+        product: {
+            id: "digikala:1",
+            title: "اسپیکر بلوتوثی قابل حمل تراست مدل Zowy",
+            price: 1_850_000,
+            imageUrl: "https://dkstatics-public.digikala.com/digikala-products/1.jpg",
+            partner: "digikala",
+            available: true,
+            url: "https://www.digikala.com/product/dkp-1/",
+            rating: 84,
+            reviewCount: 120,
+        },
+        affiliateUrl: "https://www.digikala.com/product/dkp-1/",
+        rationale: "چون عاشق موسیقی و پادکسته و می‌تونه هرجا با خودش ببرتش.",
+    },
+];
 
 const SAMPLES: RecommendEvent[] = [
     { type: "start", timeoutMs: 25_000 },
@@ -11,17 +29,17 @@ const SAMPLES: RecommendEvent[] = [
     { type: "stage", stage: "filtering", candidateCount: 37 },
     { type: "stage", stage: "assembling" },
     { type: "partner_failed", partner: "snapshop" },
-    { type: "result", items: MOCK_ITEMS, failedPartners: [] },
+    { type: "result", items: ITEMS, failedPartners: [] },
     { type: "error", code: "timeout" },
 ];
 
 const kindOf = (event: RecommendEvent) => (event.type === "stage" ? `stage/${event.stage}` : event.type);
 
-const product = MOCK_ITEMS[0].product;
+const product = ITEMS[0].product;
 const resultLine = (overrides: Record<string, unknown>) =>
     JSON.stringify({
         type: "result",
-        items: [{ ...MOCK_ITEMS[0], product: { ...product, ...overrides } }],
+        items: [{ ...ITEMS[0], product: { ...product, ...overrides } }],
         failedPartners: [],
     });
 
