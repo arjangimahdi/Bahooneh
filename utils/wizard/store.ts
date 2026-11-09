@@ -25,10 +25,14 @@ export const emptyDraft: WizardDraft = {
     occasion: {
         occasion: null,
         vibe: [],
+        situation: null,
+        preference: null,
         freeText: "",
     },
     interests: {
         interests: [],
+        habits: [],
+        footballTeam: "",
         freeText: "",
     },
     antiPrefs: {
@@ -109,6 +113,9 @@ export const useWizardStore = create<WizardStore>()(
                             ...draft.antiPrefs,
                             alreadyOwns: pruneAlreadyOwns(draft.antiPrefs.alreadyOwns, draft.interests.interests),
                         };
+                        if (!draft.interests.habits.includes("football")) {
+                            draft.interests = { ...draft.interests, footballTeam: "" };
+                        }
                     }
 
                     return { draft, errors: { ...state.errors, [stepId]: {} } };
@@ -116,7 +123,7 @@ export const useWizardStore = create<WizardStore>()(
         }),
         {
             name: "byadet-wizard",
-            version: 3,
+            version: 4,
             storage: createJSONStorage(() => sessionStorage),
             migrate: (persisted, version) => {
                 const state = persisted as Pick<WizardState, "draft" | "currentStepIndex">;
@@ -127,6 +134,13 @@ export const useWizardStore = create<WizardStore>()(
                     state.draft = {
                         ...state.draft,
                         target: { ...target, relationship: relationships?.[0] ?? null },
+                    };
+                }
+                if (version < 4) {
+                    state.draft = {
+                        ...state.draft,
+                        occasion: { ...emptyDraft.occasion, ...state.draft.occasion },
+                        interests: { ...emptyDraft.interests, ...state.draft.interests },
                     };
                 }
                 return state;

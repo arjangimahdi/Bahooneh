@@ -24,8 +24,8 @@ vi.mock("../partners/shops", () => {
 
 const payload: WizardPayload = {
     target: { ageRange: "30s", gender: null, relationship: "friend", freeText: "" },
-    occasion: { occasion: "birthday", vibe: [], freeText: "" },
-    interests: { interests: ["tech"], freeText: "" },
+    occasion: { occasion: "birthday", vibe: [], situation: null, preference: null, freeText: "" },
+    interests: { interests: ["tech"], habits: [], footballTeam: "", freeText: "" },
     antiPrefs: { dislikes: [], allergies: [], alreadyOwns: [], freeText: "" },
     budget: { min: 1_000_000, max: 3_000_000, preset: "1mTo3m" },
 };

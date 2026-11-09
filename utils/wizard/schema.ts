@@ -6,12 +6,16 @@ import {
     BUDGET_FLOOR,
     BUDGET_PRESETS,
     DISLIKES,
+    FOOTBALL_TEAM_MAX,
     FREE_TEXT_MAX,
     GENDERS,
+    GIFT_PREFERENCES,
+    HABITS,
     INTERESTS,
     OCCASIONS,
     OWNS,
     RELATIONSHIPS,
+    SITUATIONS,
     VIBES,
 } from "./options";
 import type { AntiPrefsDraft, BudgetDraft, InterestsDraft, OccasionDraft, TargetDraft, WizardStepId } from "./types";
@@ -38,6 +42,8 @@ export const occasionSchema = z
     .object({
         occasion: z.enum(OCCASIONS).nullable(),
         vibe: z.array(z.enum(VIBES)),
+        situation: z.enum(SITUATIONS).nullable(),
+        preference: z.enum(GIFT_PREFERENCES).nullable(),
         freeText: optionalFreeText,
     })
     .refine((value) => value.occasion !== null || value.freeText !== "", {
@@ -48,9 +54,11 @@ export const occasionSchema = z
 export const interestsSchema = z
     .object({
         interests: z.array(z.enum(INTERESTS)),
+        habits: z.array(z.enum(HABITS)),
+        footballTeam: z.string().trim().max(FOOTBALL_TEAM_MAX),
         freeText: optionalFreeText,
     })
-    .refine((value) => value.interests.length > 0 || value.freeText !== "", {
+    .refine((value) => value.interests.length > 0 || value.habits.length > 0 || value.freeText !== "", {
         message: "wizard.interests.error",
         path: ["interests"],
     }) satisfies z.ZodType<InterestsDraft>;

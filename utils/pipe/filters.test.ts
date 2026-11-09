@@ -33,8 +33,8 @@ const payloadWith = (
     budget: Partial<WizardPayload["budget"]> = {}
 ): WizardPayload => ({
     target: { ageRange: "30s", gender: null, relationship: "friend", freeText: "" },
-    occasion: { occasion: "birthday", vibe: [], freeText: "" },
-    interests: { interests: ["tech"], freeText: "" },
+    occasion: { occasion: "birthday", vibe: [], situation: null, preference: null, freeText: "" },
+    interests: { interests: ["tech"], habits: [], footballTeam: "", freeText: "" },
     antiPrefs: { dislikes: [], allergies: [], alreadyOwns: [], freeText: "", ...antiPrefs },
     budget: { min: 100_000, max: 1_000_000, preset: null, ...budget },
 });

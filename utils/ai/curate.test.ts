@@ -12,8 +12,8 @@ vi.mock("./client", () => ({
 
 const payload: WizardPayload = {
     target: { ageRange: "30s", gender: null, relationship: "friend", freeText: "" },
-    occasion: { occasion: "birthday", vibe: [], freeText: "" },
-    interests: { interests: ["music"], freeText: "عاشق قهوه است" },
+    occasion: { occasion: "birthday", vibe: [], situation: null, preference: null, freeText: "" },
+    interests: { interests: ["music"], habits: [], footballTeam: "", freeText: "عاشق قهوه است" },
     antiPrefs: { dislikes: [], allergies: [], alreadyOwns: [], freeText: "" },
     budget: { min: 500_000, max: 1_500_000, preset: null },
 };

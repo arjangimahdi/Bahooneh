@@ -26,6 +26,23 @@ export const INTERESTS = [
     "music",
     "travel",
 ] as const;
+export const HABITS = [
+    "coffee",
+    "tea",
+    "football",
+    "series",
+    "podcast",
+    "plants",
+    "pets",
+    "cycling",
+    "photography",
+    "boardGames",
+    "cars",
+    "sweetTooth",
+] as const;
+export const SITUATIONS = ["movedHome", "newJob", "newBaby", "studying", "retired", "travelling", "newHobby"] as const;
+export const GIFT_PREFERENCES = ["useful", "keepsake", "either"] as const;
+export const FOOTBALL_TEAM_MAX = 40;
 export const DISLIKES = ["noClothes", "noPerfume", "noGag", "noFood"] as const;
 export const ALLERGIES = ["nuts", "fragrance", "latex"] as const;
 export const OWNS = [

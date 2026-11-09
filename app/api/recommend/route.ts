@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
 
     try {
         const payload = parsed.data;
-        const timeoutMs = 25_000;
+        const timeoutMs = 32_000;
         const controller = new AbortController();
         const timer = setTimeout(() => {
             controller.abort(new Error("timeout_reached"));

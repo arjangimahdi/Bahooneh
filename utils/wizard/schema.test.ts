@@ -93,3 +93,27 @@ describe("budgetSchema", () => {
         expect(budgetSchema.safeParse(budget(BUDGET_FLOOR, BUDGET_CEILING)).success).toBe(true);
     });
 });
+
+describe("habits, team, situation and preference", () => {
+    const interests = emptyDraft.interests;
+    const occasion = { ...emptyDraft.occasion, occasion: "birthday" as const };
+
+    it("lets the interests step pass with habits only", () => {
+        expect(interestsSchema.safeParse({ ...interests, habits: ["tea"] }).success).toBe(true);
+    });
+
+    it("rejects an unknown habit and a too-long team name", () => {
+        expect(interestsSchema.safeParse({ ...interests, habits: ["skydiving"] }).success).toBe(false);
+        expect(
+            interestsSchema.safeParse({ ...interests, habits: ["football"], footballTeam: "پ".repeat(41) }).success
+        ).toBe(false);
+    });
+
+    it("accepts a known situation and preference, and rejects unknown ones", () => {
+        expect(occasionSchema.safeParse({ ...occasion, situation: "movedHome", preference: "useful" }).success).toBe(
+            true
+        );
+        expect(occasionSchema.safeParse({ ...occasion, situation: "lottery" }).success).toBe(false);
+        expect(occasionSchema.safeParse({ ...occasion, preference: "expensive" }).success).toBe(false);
+    });
+});

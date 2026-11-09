@@ -1,6 +1,6 @@
 import { t } from "@/i18n";
 import { ChipGroup, Textarea } from "@/components/ui";
-import { FREE_TEXT_MAX, OCCASIONS, VIBES } from "@/utils/wizard/options";
+import { FREE_TEXT_MAX, GIFT_PREFERENCES, OCCASIONS, SITUATIONS, VIBES } from "@/utils/wizard/options";
 import { useStepDraft, useStepErrors } from "@/utils/wizard/store";
 
 export default function OccasionStep() {
@@ -31,6 +31,24 @@ export default function OccasionStep() {
                 multiSelect
                 onChange={(vibe) => patch({ vibe })}
                 error={errors.vibe && t(errors.vibe)}
+            />
+            <ChipGroup
+                group="situation"
+                label={t("wizard.occasion.situation")}
+                hint={t("common.optional")}
+                chips={SITUATIONS}
+                value={occasion.situation ? [occasion.situation] : []}
+                onChange={([value = null]) => patch({ situation: value })}
+                error={errors.situation && t(errors.situation)}
+            />
+            <ChipGroup
+                group="preference"
+                label={t("wizard.occasion.preference")}
+                hint={t("common.optional")}
+                chips={GIFT_PREFERENCES}
+                value={occasion.preference ? [occasion.preference] : []}
+                onChange={([value = null]) => patch({ preference: value })}
+                error={errors.preference && t(errors.preference)}
             />
 
             <Textarea

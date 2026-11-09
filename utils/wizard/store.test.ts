@@ -155,3 +155,41 @@ describe("persisted draft migration", () => {
         expect(migrated.draft.target).toEqual({ ...emptyDraft.target, relationship: "parent" });
     });
 });
+
+describe("habits and football team", () => {
+    it("clears the team when football is no longer picked", () => {
+        store().setStepDraft("interests", { habits: ["football", "tea"], footballTeam: "پرسپولیس" });
+        expect(store().draft.interests.footballTeam).toBe("پرسپولیس");
+        store().setStepDraft("interests", { habits: ["tea"] });
+        expect(store().draft.interests.footballTeam).toBe("");
+    });
+});
+
+describe("v3 draft migration", () => {
+    it("adds the new optional fields with empty values and keeps the old answers", () => {
+        const { migrate } = useWizardStore.persist.getOptions();
+        const v3 = {
+            currentStepIndex: 2,
+            draft: {
+                ...emptyDraft,
+                occasion: { occasion: "birthday", vibe: ["playful"], freeText: "سورپرایز" },
+                interests: { interests: ["tech"], freeText: "قهوه" },
+            },
+        };
+        const migrated = migrate?.(v3, 3) as { draft: WizardDraft; currentStepIndex: number };
+        expect(migrated.draft.occasion).toEqual({
+            occasion: "birthday",
+            vibe: ["playful"],
+            situation: null,
+            preference: null,
+            freeText: "سورپرایز",
+        });
+        expect(migrated.draft.interests).toEqual({
+            interests: ["tech"],
+            habits: [],
+            footballTeam: "",
+            freeText: "قهوه",
+        });
+        expect(migrated.currentStepIndex).toBe(2);
+    });
+});
