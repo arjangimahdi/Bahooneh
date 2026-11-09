@@ -11,6 +11,8 @@ export const productSchema = z.object({
     imageUrl: z.url().nullable(),
     price: z.number(),
     url: z.url(),
+    rating: z.number().optional(),
+    reviewCount: z.number().int().nonnegative().optional(),
     available: z.boolean(),
     category: z.string().optional(),
 }) satisfies z.ZodType<Product>;

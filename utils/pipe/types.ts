@@ -1,4 +1,4 @@
-import { Intent } from "../ai/query";
+import type { Intent } from "../ai/query";
 
 export const PARTNER_IDS = ["digikala", "snapshop", "mock"] as const;
 export type PartnerId = (typeof PARTNER_IDS)[number];

@@ -6,10 +6,13 @@ import type {
     BUDGET_PRESETS,
     DISLIKES,
     GENDERS,
+    GIFT_PREFERENCES,
+    HABITS,
     INTERESTS,
     OCCASIONS,
     OWNS,
     RELATIONSHIPS,
+    SITUATIONS,
     VIBES,
     WIZARD_STEPS,
 } from "./options";
@@ -20,6 +23,9 @@ export type Relationship = (typeof RELATIONSHIPS)[number];
 export type Occasion = (typeof OCCASIONS)[number];
 export type Vibe = (typeof VIBES)[number];
 export type Interest = (typeof INTERESTS)[number];
+export type Habit = (typeof HABITS)[number];
+export type Situation = (typeof SITUATIONS)[number];
+export type GiftPreference = (typeof GIFT_PREFERENCES)[number];
 export type Dislike = (typeof DISLIKES)[number];
 export type Allergy = (typeof ALLERGIES)[number];
 export type Owns = (typeof OWNS)[number];
@@ -37,11 +43,15 @@ export interface TargetDraft {
 export interface OccasionDraft {
     occasion: Occasion | null;
     vibe: Vibe[];
+    situation: Situation | null;
+    preference: GiftPreference | null;
     freeText: string;
 }
 
 export interface InterestsDraft {
     interests: Interest[];
+    habits: Habit[];
+    footballTeam: string;
     freeText: string;
 }
 

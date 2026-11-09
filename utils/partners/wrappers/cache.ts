@@ -1,4 +1,5 @@
 import { PartnerId, Product } from "@/utils/pipe/types";
+import { normaliseText } from "@/utils/text/normalise";
 import { PartnerAdapter, SearchQuery } from "../types";
 
 const DEFAULT_MAX_ENTRIES = 30;
@@ -14,11 +15,8 @@ interface CacheOptions {
     maxEntries?: number;
 }
 
-const normaliseTerm = (term: string): string =>
-    term.replace(/ي/g, "ی").replace(/ك/g, "ک").replace(/‌/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
-
 const buildCacheKey = (q: SearchQuery, partner: PartnerId): string => {
-    return `${partner}|${normaliseTerm(q.term)}|${q.minPrice}|${q.maxPrice}|${q.limit}`;
+    return `${partner}|${normaliseText(q.term)}|${q.minPrice}|${q.maxPrice}|${q.limit}`;
 };
 
 export function withCache(adapter: PartnerAdapter, options: CacheOptions): PartnerAdapter {

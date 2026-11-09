@@ -1,13 +1,11 @@
 import type { Intent } from "../ai/query";
-import { byId } from "../partners/shops";
-import { PartnerAdapter, SearchQuery } from "../partners/types";
-import { BudgetDraft } from "../wizard/types";
-import { Candidate, OutcomeResults, Product, ResultItem } from "./types";
+import type { PartnerAdapter, SearchQuery } from "../partners/types";
+import { BUDGET_CEILING, BUDGET_FLOOR } from "../wizard/options";
+import type { BudgetDraft } from "../wizard/types";
+import type { Candidate, OutcomeResults, Product } from "./types";
 
 export const RESULTS_PER_QUERY = 6;
-export const BUDGET_FLOOR = 50_000;
 export const PARTNER_TIMEOUT_MS = 8_000;
-export const BUDGET_CEILING = 30_000_000;
 
 interface ShopResult {
     shop: PartnerAdapter;
@@ -69,25 +67,4 @@ export async function fetchCandidates(input: FetchInput): Promise<OutcomeResults
             })
             .map((shop) => shop.shop.id),
     };
-}
-
-export function toResultItem(candidates: Candidate[]): ResultItem[] {
-    const seen = new Set<string>();
-
-    const results = candidates
-        .filter(({ product }) => {
-            if (seen.has(product.id)) return false;
-            seen.add(product.id);
-            return true;
-        })
-        .slice(0, 12)
-        .map(({ product }) => {
-            return {
-                product,
-                rationale: "",
-                affiliateUrl: byId.get(product.partner)?.affiliateUrl(product) ?? product.url,
-            };
-        });
-
-    return results;
 }

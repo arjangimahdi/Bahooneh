@@ -1,6 +1,6 @@
 import { t } from "@/i18n";
-import { ChipGroup, Textarea } from "@/components/ui";
-import { FREE_TEXT_MAX, INTERESTS } from "@/utils/wizard/options";
+import { ChipGroup, Input, Textarea } from "@/components/ui";
+import { FOOTBALL_TEAM_MAX, FREE_TEXT_MAX, HABITS, INTERESTS } from "@/utils/wizard/options";
 import { useStepDraft, useStepErrors } from "@/utils/wizard/store";
 
 export default function InterestsStep() {
@@ -27,6 +27,30 @@ export default function InterestsStep() {
                     error={errors.interests && t(errors.interests)}
                 />
                 {countHint && <p className="text-sm text-muted">{t(countHint)}</p>}
+            </div>
+
+            <div className="flex flex-col gap-3">
+                <ChipGroup
+                    group="habit"
+                    label={t("wizard.interests.habits")}
+                    hint={t("common.optional")}
+                    chips={HABITS}
+                    value={interests.habits}
+                    multiSelect
+                    onChange={(habits) => patch({ habits })}
+                    error={errors.habits && t(errors.habits)}
+                />
+                {interests.habits.includes("football") && (
+                    <Input
+                        value={interests.footballTeam}
+                        label={t("wizard.interests.footballTeam")}
+                        placeholder={t("wizard.interests.footballTeamPlaceholder")}
+                        hint={t("common.optional")}
+                        error={errors.footballTeam && t(errors.footballTeam)}
+                        maxLength={FOOTBALL_TEAM_MAX}
+                        onChange={(e) => patch({ footballTeam: e.target.value })}
+                    />
+                )}
             </div>
 
             <Textarea

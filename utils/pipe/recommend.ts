@@ -1,18 +1,25 @@
-import { WizardPayload } from "../wizard/schema";
-import { ErrorCode, RecommendEvent } from "./events";
-import { getLLMOutput } from "../ai/query";
+import { curate, type CuratePick } from "../ai/curate";
 import { LLMError } from "../ai/provider";
-import { sleep } from "../partners/http";
-import { partners } from "../partners/shops";
-import { fetchCandidates, toResultItem } from "./fetchCandidates";
-
-const SIM_DELAY = { ideating: 1000, fetching: 4500, filtering: 800, assembling: 500 };
+import { getLLMOutput } from "../ai/query";
+import { byId, partners } from "../partners/shops";
+import type { WizardPayload } from "../wizard/schema";
+import type { ErrorCode, RecommendEvent } from "./events";
+import { fetchCandidates } from "./fetchCandidates";
+import { applyHardFilters } from "./filters";
+import type { ResultItem } from "./types";
 
 const toErrorCode = (error: unknown, signal: AbortSignal): ErrorCode => {
     if (signal.aborted) return "timeout";
     if (error instanceof LLMError) return "ai_unavailable";
     return "internal";
 };
+
+const toResultItems = (picks: readonly CuratePick[]): ResultItem[] =>
+    picks.map(({ candidate: { product }, rationale }) => ({
+        product,
+        rationale,
+        affiliateUrl: byId.get(product.partner)?.affiliateUrl(product) ?? product.url,
+    }));
 
 export async function* recommend(payload: WizardPayload, signal: AbortSignal): AsyncGenerator<RecommendEvent> {
     try {
@@ -40,11 +47,12 @@ export async function* recommend(payload: WizardPayload, signal: AbortSignal): A
         }
 
         yield { type: "stage", stage: "filtering", candidateCount: candidates.length };
-        const kept = toResultItem(candidates);
+        const filtered = applyHardFilters(candidates, payload);
 
         yield { type: "stage", stage: "assembling" };
+        const picks = await curate({ payload, candidates: filtered, recipientLabel: recipient_label, signal });
 
-        yield { type: "result", items: kept, failedPartners: failedPartners };
+        yield { type: "result", items: toResultItems(picks), failedPartners };
     } catch (error) {
         if (!signal.aborted) console.error("[pipe/recommend] failed", error);
         yield { type: "error", code: toErrorCode(error, signal) };
